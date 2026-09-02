@@ -32,6 +32,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import logging
+import time
 from pathlib import Path
 
 import numpy as np
@@ -49,6 +50,17 @@ logger = logging.getLogger("stockSystem.real_providers")
 
 TWSE_BASE = "https://openapi.twse.com.tw/v1"
 TPEX_BASE = "https://www.tpex.org.tw/openapi/v1"
+# 三大法人買賣超（T86）不在新版開放資料平台（openapi.twse.com.tw）上，只能從證交所
+# 舊版「盤後資訊」系統取得，回傳格式也不同（見下面 _rows_from_fields_data 的說明）。
+TWSE_LEGACY_BASE = "https://www.twse.com.tw/rwd/zh"
+
+# 2026-09-02 第一次在 GitHub Actions 真正執行後發現：requests 預設的 User-Agent 會被
+# Yahoo Finance 判定為爬蟲、對 GitHub Actions 的共用 IP 回傳 429 Too Many Requests。
+# 帶一個一般瀏覽器的 User-Agent 可以大幅降低被擋的機率（見 KNOWN_ISSUES.md）。
+_BROWSER_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -93,9 +105,35 @@ def _to_int(value, default: int = 0) -> int:
 # ---------------------------------------------------------------------------
 
 def _get_json(session, url: str, timeout: int = 30):
-    resp = session.get(url, timeout=timeout, headers={"Accept": "application/json"})
+    resp = session.get(
+        url,
+        timeout=timeout,
+        headers={"Accept": "application/json", "User-Agent": _BROWSER_USER_AGENT},
+    )
     resp.raise_for_status()
     return resp.json()
+
+
+def _rows_from_fields_data(raw: dict, endpoint_label: str) -> list[dict]:
+    """把 TWSE 舊版「盤後資訊」系統（www.twse.com.tw/rwd/zh/...）回傳的
+    `{"stat": "OK", "fields": [...], "data": [[...], ...]}` 格式，轉成跟
+    openapi.twse.com.tw 一致的「物件陣列」（每筆資料是一個 dict），這樣下游的
+    `_find_key` / `_parse_market_rows` 完全不用區分資料來源、不用改介面。
+
+    2026-09-02 第一次在 GitHub Actions 真正執行時發現：原本以為三大法人買賣超
+    也在 openapi.twse.com.tw（新版開放資料平台）上、用跟其他端點一樣的物件陣列格式，
+    結果那個端點根本不存在（404），真正的資料在這個完全不同的舊系統上，且格式也不同。
+    """
+    stat = raw.get("stat")
+    if stat != "OK":
+        raise DataValidationError(
+            f"{endpoint_label} 回應的 stat 不是 'OK'（實際是 {stat!r}），"
+            "可能是非交易日、假日、或當天資料還沒公布，不應該當作解析失敗直接崩潰，"
+            "但也不該假裝有資料——呼叫端要把這個當成『今天沒抓到』處理。"
+        )
+    fields = raw.get("fields") or []
+    data_rows = raw.get("data") or []
+    return [dict(zip(fields, row)) for row in data_rows]
 
 
 # ---------------------------------------------------------------------------
@@ -134,8 +172,15 @@ def fetch_daily_snapshot_dict(session, as_of: dt.date) -> dict:
         result["twse_industry"] = []
 
     # --- 三大法人買賣超 ---
+    # 注意：這個資料集不在 openapi.twse.com.tw（新版開放資料平台）上，要用證交所舊版
+    # 「盤後資訊」系統的 www.twse.com.tw/rwd/zh/fund/T86（見 TWSE_LEGACY_BASE 說明），
+    # 回傳格式也跟其他端點不同，用 _rows_from_fields_data 轉換成一致的物件陣列。
     try:
-        result["twse_institutional"] = _get_json(session, f"{TWSE_BASE}/fund/T86")
+        date_str = as_of.strftime("%Y%m%d")
+        raw = _get_json(
+            session, f"{TWSE_LEGACY_BASE}/fund/T86?date={date_str}&selectType=ALL&response=json"
+        )
+        result["twse_institutional"] = _rows_from_fields_data(raw, "TWSE 三大法人買賣超(T86)")
     except Exception as exc:  # noqa: BLE001
         logger.warning("TWSE 三大法人買賣超抓取失敗: %r", exc)
         result["twse_institutional"] = None  # None 代表「沒抓到」，區別於「抓到但是空清單」
@@ -412,7 +457,15 @@ class RealYFinanceIntlProvider:
     這個端點在這個 Cowork 沙盒裡會被 WebFetch 的 robots.txt 檢查擋下（見 KNOWN_ISSUES.md 問題3），
     但那是 WebFetch 工具自己的政策，不是端點本身的限制——用一般的 `requests` 直接呼叫應該沒問題，
     GitHub Actions 環境下第一次執行時務必確認一次。
+
+    2026-09-02 第一次在 GitHub Actions 真正執行後發現：全部 8 個 ticker 都收到 429 Too Many
+    Requests——Yahoo Finance 會用 User-Agent 判斷是不是爬蟲，對沒有 User-Agent（requests 預設值）
+    又短時間內連續打好幾個 ticker 的請求特別容易擋。修正方式有兩個：(1) `_get_json` 現在會帶一個
+    一般瀏覽器的 User-Agent（見檔案開頭 `_BROWSER_USER_AGENT`）；(2) 下面每個 ticker 之間加一個
+    小延遲，不要在同一瞬間連續發 8 個請求。
     """
+
+    REQUEST_INTERVAL_SECONDS = 1.0
 
     TICKERS = {
         "NASDAQ": "^IXIC",
@@ -432,7 +485,9 @@ class RealYFinanceIntlProvider:
 
     def get_intl_snapshot(self, as_of: dt.date) -> dict:
         out = {}
-        for label, symbol in self.TICKERS.items():
+        for i, (label, symbol) in enumerate(self.TICKERS.items()):
+            if i > 0:
+                time.sleep(self.REQUEST_INTERVAL_SECONDS)  # 避免短時間連續打 8 個請求被判定成爬蟲
             try:
                 url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range=5d&interval=1d"
                 data = _get_json(self._session, url)
