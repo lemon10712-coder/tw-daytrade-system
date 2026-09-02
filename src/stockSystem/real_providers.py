@@ -136,6 +136,31 @@ def _rows_from_fields_data(raw: dict, endpoint_label: str) -> list[dict]:
     return [dict(zip(fields, row)) for row in data_rows]
 
 
+def _fetch_institutional_flow_with_lookback(
+    session, as_of: dt.date, max_lookback_days: int = 7
+) -> list[dict] | None:
+    """查 T86（三大法人買賣超），從 `as_of` 往前找，遇到第一個「已經公布資料」的交易日就回傳那天的。
+
+    背景：T86 是收盤後才會公布當天資料的端點，如果排程在開盤前執行（例如台北時間 08:15），
+    `as_of`（今天）當天的資料根本還不存在，一定會拿到 stat 不是 "OK" 的回應。這不是端點壞掉，
+    是「該查哪一天」的邏輯問題——所以這裡改成往前試，遇到週末、假日、或當天還沒公布都自動跳到
+    再前一天，最多試 `max_lookback_days` 天，找不到就回傳 None（呼叫端會照樣把這個當成
+    「今天沒抓到」處理，不會假裝有資料）。
+    """
+    for delta in range(max_lookback_days):
+        query_date = as_of - dt.timedelta(days=delta)
+        date_str = query_date.strftime("%Y%m%d")
+        try:
+            raw = _get_json(
+                session, f"{TWSE_LEGACY_BASE}/fund/T86?date={date_str}&selectType=ALL&response=json"
+            )
+            return _rows_from_fields_data(raw, f"TWSE 三大法人買賣超(T86, {date_str})")
+        except Exception as exc:  # noqa: BLE001
+            logger.info("TWSE 三大法人買賣超 %s 沒有已公布的資料，往前找上一個交易日: %r", date_str, exc)
+            continue
+    return None
+
+
 # ---------------------------------------------------------------------------
 # 每日快照抓取：把 TWSE + TPEx 當天的全市場資料整理成一個可以存檔的 dict
 # ---------------------------------------------------------------------------
@@ -175,12 +200,16 @@ def fetch_daily_snapshot_dict(session, as_of: dt.date) -> dict:
     # 注意：這個資料集不在 openapi.twse.com.tw（新版開放資料平台）上，要用證交所舊版
     # 「盤後資訊」系統的 www.twse.com.tw/rwd/zh/fund/T86（見 TWSE_LEGACY_BASE 說明），
     # 回傳格式也跟其他端點不同，用 _rows_from_fields_data 轉換成一致的物件陣列。
+    #
+    # 2026-09-03 第二次在 GitHub Actions 真正執行後發現：排程是台北時間 08:15（開盤前）執行，
+    # 這時候 as_of（今天）的三大法人資料根本還沒公布（要收盤後才有），用 as_of 當天的日期查
+    # 永遠只會拿到 stat 不是 "OK" 的「今天沒資料」——不是端點壞掉，是查詢的日期邏輯本來就錯了。
+    # 改成從 as_of 往前找，遇到第一個「已經公布資料」的交易日就用那天的（週末／假日／還沒公布
+    # 都會自動跳過，最多往前找 7 天，避免連假期間無限往前找）。
     try:
-        date_str = as_of.strftime("%Y%m%d")
-        raw = _get_json(
-            session, f"{TWSE_LEGACY_BASE}/fund/T86?date={date_str}&selectType=ALL&response=json"
-        )
-        result["twse_institutional"] = _rows_from_fields_data(raw, "TWSE 三大法人買賣超(T86)")
+        result["twse_institutional"] = _fetch_institutional_flow_with_lookback(session, as_of)
+        if result["twse_institutional"] is None:
+            logger.warning("TWSE 三大法人買賣超：往前找了 7 天都沒有已公布的資料")
     except Exception as exc:  # noqa: BLE001
         logger.warning("TWSE 三大法人買賣超抓取失敗: %r", exc)
         result["twse_institutional"] = None  # None 代表「沒抓到」，區別於「抓到但是空清單」
