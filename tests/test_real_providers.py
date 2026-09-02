@@ -16,6 +16,7 @@ from stockSystem.real_providers import (
     DailySnapshotStore,
     _find_key,
     _parse_market_rows,
+    _rows_from_fields_data,
     _to_float,
     _to_int,
     build_snapshot,
@@ -109,6 +110,34 @@ def test_daily_snapshot_store_round_trip(tmp_path):
     loaded = store.load(d)
     assert loaded["hello"] == "world"
     assert store.load(dt.date(2026, 1, 1)) is None  # 沒存過的日期回傳 None，不是拋例外
+
+
+def test_rows_from_fields_data_converts_twse_legacy_format_to_object_array():
+    """2026-09-02 第一次在 GitHub Actions 真正執行時發現：三大法人買賣超（T86）不在
+    openapi.twse.com.tw 上，要打證交所舊系統 www.twse.com.tw/rwd/zh/fund/T86，
+    回傳格式是 {"stat","fields","data"}（欄位名跟資料分開兩個陣列），不是其他端點
+    那種「每筆資料是一個物件」的格式，這個測試鎖住轉換邏輯不能再壞掉。
+    """
+    raw = {
+        "stat": "OK",
+        "fields": ["證券代號", "證券名稱", "三大法人買賣超股數"],
+        "data": [["2330", "台積電", "12345"], ["2454", "聯發科", "-6789"]],
+    }
+    rows = _rows_from_fields_data(raw, "TWSE 三大法人買賣超(T86)")
+    assert rows == [
+        {"證券代號": "2330", "證券名稱": "台積電", "三大法人買賣超股數": "12345"},
+        {"證券代號": "2454", "證券名稱": "聯發科", "三大法人買賣超股數": "-6789"},
+    ]
+
+
+def test_rows_from_fields_data_raises_clear_error_when_stat_not_ok():
+    """stat 不是 "OK"（例如非交易日、資料還沒公布）時要清楚報錯，讓呼叫端當成
+    「今天沒抓到」處理，而不是悄悄回傳空清單假裝三大法人今天沒買賣超。
+    """
+    raw = {"stat": "很抱歉，沒有符合條件的資料!", "fields": [], "data": []}
+    with pytest.raises(DataValidationError) as exc_info:
+        _rows_from_fields_data(raw, "TWSE 三大法人買賣超(T86)")
+    assert "stat" in str(exc_info.value)
 
 
 def test_daily_snapshot_store_load_recent_skips_missing_days(tmp_path):
