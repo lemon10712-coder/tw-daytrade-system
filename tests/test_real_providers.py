@@ -14,6 +14,7 @@ import pytest
 from stockSystem.data_sources import DataValidationError
 from stockSystem.real_providers import (
     DailySnapshotStore,
+    _fetch_institutional_flow_with_lookback,
     _find_key,
     _parse_market_rows,
     _rows_from_fields_data,
@@ -138,6 +139,66 @@ def test_rows_from_fields_data_raises_clear_error_when_stat_not_ok():
     with pytest.raises(DataValidationError) as exc_info:
         _rows_from_fields_data(raw, "TWSE 三大法人買賣超(T86)")
     assert "stat" in str(exc_info.value)
+
+
+class _FakeResponse:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._payload
+
+
+class _FakeSessionByDate:
+    """模擬 T86：只有指定的某幾天有「已公布」的資料，其他天回傳 stat 不是 OK。
+
+    用來測試 `_fetch_institutional_flow_with_lookback` 是否真的會往前找，而不是
+    排程在開盤前執行、當天資料還沒公布時就直接放棄。
+    """
+
+    def __init__(self, available_dates: set[str]):
+        self._available_dates = available_dates
+        self.requested_urls: list[str] = []
+
+    def get(self, url, timeout=30, headers=None):
+        self.requested_urls.append(url)
+        date_str = url.split("date=")[1].split("&")[0]
+        if date_str in self._available_dates:
+            payload = {
+                "stat": "OK",
+                "fields": ["證券代號", "三大法人買賣超股數"],
+                "data": [["2330", "1000"]],
+            }
+        else:
+            payload = {"stat": "很抱歉，沒有符合條件的資料!", "fields": [], "data": []}
+        return _FakeResponse(payload)
+
+
+def test_fetch_institutional_flow_with_lookback_skips_to_last_published_day():
+    """2026-09-03 第二次在 GitHub Actions 真正執行時發現：排程在開盤前(台北時間 08:15)跑，
+    當天(as_of)的三大法人資料根本還沒公布，用 as_of 當天查永遠只會拿到「沒資料」。
+    這個測試鎖住「自動往前找最近一個已公布資料的交易日」這個行為不能再壞掉。
+    """
+    as_of = dt.date(2026, 9, 3)  # 當天沒資料
+    session = _FakeSessionByDate(available_dates={"20260902"})  # 前一天有資料
+    rows = _fetch_institutional_flow_with_lookback(session, as_of, max_lookback_days=7)
+    assert rows == [{"證券代號": "2330", "三大法人買賣超股數": "1000"}]
+    # 應該先試 as_of 當天(20260903)，沒資料才試前一天(20260902)，不能跳過 as_of 直接查前一天
+    assert session.requested_urls[0].endswith("date=20260903&selectType=ALL&response=json")
+    assert session.requested_urls[1].endswith("date=20260902&selectType=ALL&response=json")
+
+
+def test_fetch_institutional_flow_with_lookback_gives_up_after_max_days():
+    """連續好幾天都沒有已公布的資料（例如長假）時，要在試完 max_lookback_days 天後放棄回傳
+    None，而不是無限往前找卡住整個流程。"""
+    as_of = dt.date(2026, 9, 3)
+    session = _FakeSessionByDate(available_dates=set())  # 完全沒有任何一天有資料
+    rows = _fetch_institutional_flow_with_lookback(session, as_of, max_lookback_days=3)
+    assert rows is None
+    assert len(session.requested_urls) == 3
 
 
 def test_daily_snapshot_store_load_recent_skips_missing_days(tmp_path):
