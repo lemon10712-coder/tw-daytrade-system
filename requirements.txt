@@ -1,0 +1,6 @@
+pandas
+numpy
+scipy
+requests
+pytest
+# yfinance  # 網路權限開通後取消註解並安裝，見 KNOWN_ISSUES.md
