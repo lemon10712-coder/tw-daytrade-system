@@ -23,6 +23,7 @@ from stockSystem.real_providers import (
     _to_float,
     _to_int,
     build_snapshot,
+    sector_name_for_code,
 )
 
 
@@ -67,6 +68,55 @@ def test_parse_market_rows_converts_volume_shares_to_lots():
     parsed = _parse_market_rows(rows, "TWSE")
     assert parsed["2330"]["close"] == 2385.0
     assert parsed["2330"]["volume"] == pytest.approx(19783.0)  # 股 -> 張，除以1000
+    assert parsed["2330"]["name"] == "測試股"
+
+
+def test_parse_market_rows_handles_tpex_openapi_short_english_field_names():
+    """2026-09-03 第三次真實環境查證後發現：TPEx 新版 openapi
+    （tpex_mainboard_daily_close_quotes，每天正式產生報告時用來抓上櫃股票「今天」資料的
+    端點）用的英文欄位名稱是 Open/High/Low/Close/TradingShares/CompanyName 這種短名稱，
+    跟 TWSE STOCK_DAY_ALL 的 OpeningPrice/HighestPrice/.../TradeVolume（"-ing"/"-est" 字尾）
+    長得很像但其實不一樣——修正前這裡完全沒有處理這組欄位，導致每天的上櫃股票 today 資料
+    全部被解析成 nan，這個測試鎖住修正後的行為不能再壞掉。
+    """
+    row = {
+        "Date": "1150902",
+        "SecuritiesCompanyCode": "6488",
+        "CompanyName": "环球晶",
+        "Close": "500.00",
+        "Change": "-0.19 ",
+        "Open": "495.00",
+        "High": "505.00",
+        "Low": "490.00",
+        "Average": "498.00",
+        "TradingShares": "3000000",
+        "TransactionAmount": "1500000000",
+    }
+    parsed = _parse_market_rows([row], "TPEx")
+    assert parsed["6488"]["name"] == "环球晶"
+    assert parsed["6488"]["open"] == 495.0
+    assert parsed["6488"]["high"] == 505.0
+    assert parsed["6488"]["low"] == 490.0
+    assert parsed["6488"]["close"] == 500.0
+    assert parsed["6488"]["volume"] == pytest.approx(3000.0)  # 股 -> 張
+
+
+def test_sector_name_for_code_resolves_official_names():
+    """代碼表是從 TWSE 官方查詢工具 isin.twse.com.tw/isin/class_i.jsp?kind=4 的下拉選單
+    對照真實回應驗證過的（見 real_providers.SECTOR_CODE_NAME 的說明），這裡鎖住幾個
+    報告裡實際出現過、使用者反映「看不懂」的代碼一定要能正確轉換。
+    """
+    assert sector_name_for_code("17") == "金融保險業"
+    assert sector_name_for_code("24") == "半導體業"
+    assert sector_name_for_code("30") == "資訊服務業"
+    assert sector_name_for_code("37") == "運動休閒"
+
+
+def test_sector_name_for_code_falls_back_gracefully_for_unknown_code():
+    """代碼表以外的代碼（例如已停用的代碼）不該讓整個解析流程壞掉，也不該假裝成一個
+    正常名稱誤導使用者，而是要在顯示的文字裡保留代碼本身方便追查。"""
+    assert "代碼99" in sector_name_for_code("99")
+    assert sector_name_for_code("") == "未分類"
 
 
 def test_build_snapshot_accumulates_multi_day_close_history(tmp_path):
@@ -78,7 +128,10 @@ def test_build_snapshot_accumulates_multi_day_close_history(tmp_path):
             "as_of": d.isoformat(),
             "twse_daily": [_fake_twse_row("2330", closes[d])],
             "tpex_daily": [],
-            "twse_industry": [{"公司代號": "2330", "產業別": "半導體業"}],
+            # "產業別" 真實回應給的是代碼（見 real_providers.SECTOR_CODE_NAME 的說明），
+            # 不是名稱——用真代碼 "24"，斷言解析後的 sector 是對照表轉出來的全名。
+            "twse_industry": [{"公司代號": "2330", "產業別": "24"}],
+            "tpex_industry": [],
             "twse_institutional": None,
             "twse_margin": None,
             "twse_watch": None,
@@ -93,8 +146,79 @@ def test_build_snapshot_accumulates_multi_day_close_history(tmp_path):
     assert "2330" in snapshot.ohlcv.index
     row = snapshot.ohlcv.loc["2330"]
     assert list(row["close_hist"]) == pytest.approx([100.0, 105.0])
-    assert row["sector"] == "半導體業"
+    assert row["sector"] == "半導體業"  # 代碼 "24" 轉換後的全名，不是代碼本身
+    assert row["name"] == "測試股"  # 來自 _fake_twse_row 的 "Name" 欄位
     assert row["prev_close"] == pytest.approx(100.0)  # 用歷史序列的前一天，不是用 Change 反推
+    assert snapshot.industry_map["2330"] == "半導體業"
+
+
+def test_build_snapshot_resolves_tpex_sector_from_tpex_industry(tmp_path):
+    """2026-09-03 第三次真實環境查證後發現：之前只抓 TWSE 的產業別，完全沒抓 TPEx 的，
+    導致所有上櫃股票的族群永遠是「未分類」。這個測試鎖住 tpex_industry 也要被用上。
+    """
+    store = DailySnapshotStore(tmp_path)
+    d = dt.date(2026, 9, 2)
+    tpex_row = {
+        "SecuritiesCompanyCode": "6488",
+        "CompanyName": "环球晶",
+        "Close": "500.00",
+        "Open": "495.00",
+        "High": "505.00",
+        "Low": "490.00",
+        "TradingShares": "3000000",
+    }
+    store.save(d, {
+        "as_of": d.isoformat(),
+        "twse_daily": [],
+        "tpex_daily": [tpex_row],
+        "twse_industry": [],
+        "tpex_industry": [{"SecuritiesCompanyCode": "6488", "SecuritiesIndustryCode": "25"}],
+        "twse_institutional": None,
+        "twse_margin": None,
+        "twse_watch": None,
+        "twse_disposition": None,
+    })
+    history = store.load_recent(d, lookback_days=10)
+    snapshot = build_snapshot(d, history)
+    row = snapshot.ohlcv.loc["6488"]
+    assert row["sector"] == "電腦及週邊設備業"
+    assert row["name"] == "环球晶"
+    assert row["close"] == 500.0  # 也順便鎖住 TPEx 短字尾英文欄位不會被解析成 nan
+
+
+def test_build_snapshot_converts_institutional_flow_shares_to_lots(tmp_path):
+    """2026-09-03 第三次真實環境查證後發現：T86 的買賣超欄位單位是股，但
+    MarketSnapshot.institutional_flow 的欄位說明跟 FixtureProvider 的合成資料都是「張」，
+    且 stock_screener 的評分公式也是照「張」的量級校準的——這裡少做股->張的換算會讓
+    報告上顯示的「三大法人買超」數字誇大1000倍，也會讓法人籌碼分數失真。
+    """
+    store = DailySnapshotStore(tmp_path)
+    d = dt.date(2026, 9, 2)
+    store.save(d, {
+        "as_of": d.isoformat(),
+        "twse_daily": [_fake_twse_row("2330", 100.0)],
+        "tpex_daily": [],
+        "twse_industry": [],
+        "tpex_industry": [],
+        "twse_institutional": [
+            {
+                "代號": "2330",
+                "外陸資買賣超股數(不含外資自營商)": "3000000",
+                "外資自營商買賣超股數": "500000",
+                "投信買賣超股數": "1000000",
+                "自營商買賣超股數": "200000",
+            }
+        ],
+        "twse_margin": None,
+        "twse_watch": None,
+        "twse_disposition": None,
+    })
+    history = store.load_recent(d, lookback_days=10)
+    snapshot = build_snapshot(d, history)
+    inst = snapshot.institutional_flow.loc["2330"]
+    assert inst["foreign_net"] == pytest.approx(3500.0)  # (3,000,000+500,000)股 -> 3,500張
+    assert inst["trust_net"] == pytest.approx(1000.0)
+    assert inst["dealer_net"] == pytest.approx(200.0)
 
 
 def test_build_snapshot_raises_when_last_history_entry_is_not_as_of(tmp_path):
