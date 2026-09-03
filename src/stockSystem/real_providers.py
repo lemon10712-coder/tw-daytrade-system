@@ -169,20 +169,46 @@ def _fetch_twse_day_all(session, as_of: dt.date) -> list[dict]:
 
     背景：`fetch_daily_snapshot_dict` 平常用的 `openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL`
     只能查「今天」，沒有日期參數，沒辦法拿來回補過去的歷史快照。MI_INDEX 是同一套舊系統
-    （跟 T86 三大法人一樣，見 TWSE_LEGACY_BASE 說明）的「指定日期」版本，回傳格式也是
-    `{"stat","fields","data"}`，用 `_rows_from_fields_data` 轉成物件陣列。
-    轉出來的物件陣列欄位是中文（如「證券代號」「收盤價」），`_parse_market_rows` 本來就設計成
-    英文/中文欄位都認得（見該函式的 `_pick` fallback），不需要另外改介面。
+    （跟 T86 三大法人一樣，見 TWSE_LEGACY_BASE 說明）的「指定日期」版本。
 
-    只給 `scripts/backfill_history.py`（一次性回補歷史）用；平常的每日抓取不需要指定日期，
-    繼續用 STOCK_DAY_ALL。尚未在真實環境驗證過欄位名稱是否跟預期一致，第一次真正執行
-    `backfill_history.py` 時如果欄位對不上，`_find_key` 會清楚報錯並列出實際欄位。
+    **2026-09-03 第二次真實執行後更新（第一次的假設也是錯的，已對照真實回應驗證過）**：
+    原本以為跟 T86 一樣是扁平的 `{"stat","fields","data"}`，結果第一次修好 TPEx 之後重新產生
+    報告，發現族群強度全部是 nan%——追下去才發現 MI_INDEX 這個端點（帶 `type=ALL` 時）回傳的
+    其實是 `{"stat","tables":[{...}, ...]}`，資料被拆成 10 個左右的表格（大盤指數、報酬指數、
+    漲跌證券數…），**不是**扁平的 fields/data，所以 `_rows_from_fields_data` 原本的假設完全
+    找不到 "fields"/"data"，安靜地回傳空陣列（沒有拋錯，因為 `stat` 仍然是 "OK"）——這是回補
+    第一輪時「沒報錯但資料其實是空的」的根因。真正要的是 `tables` 陣列裡標題包含
+    「每日收盤行情」的那一個表格，格式才是每檔股票一列的 `{"fields","data"}`。
     """
     date_str = as_of.strftime("%Y%m%d")
     raw = _get_json(
         session, f"{TWSE_LEGACY_BASE}/afterTrading/MI_INDEX?date={date_str}&type=ALL&response=json"
     )
-    return _rows_from_fields_data(raw, f"TWSE 每日收盤行情(MI_INDEX, {date_str})")
+    stat = raw.get("stat") if isinstance(raw, dict) else None
+    if stat is not None and stat != "OK":
+        raise DataValidationError(
+            f"TWSE 每日收盤行情(MI_INDEX, {date_str}) 回應的 stat 不是 'OK'（實際是 {stat!r}），"
+            "可能是非交易日/假日/當天資料還沒公布，呼叫端要把這天當成『沒抓到』處理。"
+        )
+    tables = raw.get("tables") if isinstance(raw, dict) else None
+    quote_table = None
+    if isinstance(tables, list):
+        for table in tables:
+            title = (table or {}).get("title") or ""
+            if "每日收盤行情" in title:
+                quote_table = table
+                break
+    if quote_table is not None:
+        fields = quote_table.get("fields") or []
+        data_rows = quote_table.get("data") or []
+        if fields and data_rows:
+            return [dict(zip(fields, row)) for row in data_rows]
+    raise DataValidationError(
+        f"TWSE 每日收盤行情(MI_INDEX, {date_str}) 回應裡找不到標題含「每日收盤行情」且有資料的表格，"
+        f"實際回應的 top-level key 有：{sorted(raw.keys()) if isinstance(raw, dict) else type(raw)}，"
+        f"tables 的標題有：{[((t or {}).get('title')) for t in tables] if isinstance(tables, list) else None}。"
+        "可能是非交易日/假日、或格式又跟這裡假設的不一樣，需要對照這次錯誤訊息確認。"
+    )
 
 
 def _fetch_tpex_day_all(session, as_of: dt.date) -> list[dict]:
