@@ -1,0 +1,31 @@
+name: 一次性回補歷史資料到 Supabase
+
+# 手動觸發用，跟既有的 backfill-history.yml 是同一種模式：只在 Actions 頁面手動按
+# 「Run workflow」才會執行，不會排程自動跑（本來就只需要跑一次，把 data/daily/ 現有的
+# 29 個交易日快照灌進 Supabase；之後每天 daily-report.yml 產生新報告要不要順便寫入
+# Supabase，是之後可以再加的下一步，這個 workflow 目前不處理那部分）。
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pandas numpy
+
+      - name: 回補 data/daily/ 既有快照到 Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          python scripts/backfill_supabase.py
