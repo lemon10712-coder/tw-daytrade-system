@@ -1,0 +1,62 @@
+name: 回補歷史每日快照（一次性/手動）
+
+# 只能手動觸發，不排程——這是一次性把 data/daily/ 補齊到 technicals.py 需要的視窗長度
+# （MA20、ATR14、量能擴張比基準期20天，見 scripts/backfill_history.py 說明），
+# 平常的每日報告已經有 daily-report.yml 自動處理，不需要每天重跑這個。
+# 冪等設計：已經有檔案的日期會跳過，重跑不會浪費額度重抓已成功的日期。
+on:
+  workflow_dispatch:
+    inputs:
+      target_days:
+        description: "要補到有幾個交易日的資料"
+        required: false
+        default: "30"
+      max_calendar_days:
+        description: "最多往前找幾個日曆天（避免長假無限往前找）"
+        required: false
+        default: "90"
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pandas numpy pytest
+
+      - name: Run unit tests（跑測試，測試沒過就不執行回補）
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          pytest tests/ -q
+
+      - name: 回補歷史每日快照
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          python scripts/backfill_history.py \
+            --target-days "${{ github.event.inputs.target_days }}" \
+            --max-calendar-days "${{ github.event.inputs.max_calendar_days }}"
+
+      - name: Commit 並 push 回補的快照
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "沒有新的變更（可能全部日期本來就有了），不建立空 commit"
+          else
+            git commit -m "chore: 回補歷史每日快照（$(date -u +%Y-%m-%d)）"
+            git pull --rebase
+            git push
+          fi
