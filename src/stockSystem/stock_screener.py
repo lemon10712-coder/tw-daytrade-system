@@ -29,11 +29,13 @@ class ExclusionResult:
 @dataclass
 class Candidate:
     stock_id: str
+    name: str
     sector: str
     direction: str          # "long" or "short"
     price: float
     score: float
     reasons: list
+    narrative: str          # 把 reasons 的資料點組成的個股專屬分析段落，見 _narrate()
     ma_state: str
     volume_expansion: float
     institutional_net: float
@@ -60,6 +62,63 @@ def hard_filters(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Exc
         reasons.append(f"近20日均量過低({avg_vol_lots:.0f}張 < 門檻{SCORING.min_liquidity_avg_volume_lots}張)")
 
     return ExclusionResult(stock_id=stock_id, excluded=bool(reasons), reasons=reasons)
+
+
+def _narrate(
+    name: str,
+    direction: str,
+    ma_state: str,
+    pv_health: str,
+    vol_exp: float,
+    inst_net: float,
+    margin_change: float,
+    score: float,
+) -> str:
+    """把 `_score_stock` 已經算出來的技術面/籌碼面資料點，組成一段這檔股票專屬的分析文字。
+
+    這裡不引入任何新的判斷邏輯或數字——每一句話都直接對應到某個已經算出來、可以在
+    `reasons` 裡找到來源的欄位，只是把「均線多頭排列; 價漲量增(健康); 量能擴張2.8倍」
+    這種給機器看的標籤，換成人看得懂的完整句子，並且每一檔股票用的都是它自己的數字，
+    不是套用同一段罐頭文字（這正是這次要修正的問題：使用者原本看到的「理由」其實是
+    entry_exit.py 的資料限制警語，跟股票本身無關，見 report.py 的改動）。
+    """
+    parts = []
+    if direction == "long":
+        parts.append(f"{name}目前站上短中期均線且呈多頭排列，技術面偏多。")
+        if pv_health == "healthy_up":
+            parts.append("股價上漲的同時成交量同步放大，屬於價量配合的健康上攻型態。")
+        elif pv_health == "weak_up":
+            parts.append("不過股價上漲時成交量反而縮小，追價意願不強，上漲動能可能不足，追高要留意。")
+        if not pd.isna(vol_exp):
+            if vol_exp >= 1.5:
+                parts.append(f"今日成交量是近期均量的{vol_exp:.1f}倍，市場關注度明顯提高。")
+            else:
+                parts.append(f"今日量能約為近期均量的{vol_exp:.1f}倍，尚未明顯放大。")
+        if inst_net > 0:
+            parts.append(f"三大法人（外資＋投信＋自營商）合計買超約{inst_net:.0f}張，籌碼面偏多，跟技術面方向一致。")
+        elif inst_net < 0:
+            parts.append(f"但三大法人合計賣超約{abs(inst_net):.0f}張，籌碼面跟技術面方向不一致，需留意法人是否正在調節。")
+        if margin_change > 3000:
+            parts.append(f"融資餘額短期增加約{margin_change:.0f}張，若股價拉回，這批融資部位可能形成賣壓，已在評分中扣分反映。")
+    else:  # short
+        parts.append(f"{name}目前跌破短中期均線且呈空頭排列，技術面偏空。")
+        if pv_health == "healthy_down":
+            parts.append("股價下跌的同時成交量同步放大，屬於賣壓確實出籠的趨勢確認型態。")
+        elif pv_health == "weak_down":
+            parts.append("不過股價下跌時成交量反而縮小，賣壓不算積極，當沖放空的動能可能不足。")
+        if not pd.isna(vol_exp):
+            if vol_exp >= 1.5:
+                parts.append(f"今日成交量是近期均量的{vol_exp:.1f}倍，市場關注度明顯提高。")
+            else:
+                parts.append(f"今日量能約為近期均量的{vol_exp:.1f}倍，尚未明顯放大。")
+        if inst_net < 0:
+            parts.append(f"三大法人（外資＋投信＋自營商）合計賣超約{abs(inst_net):.0f}張，籌碼面偏空，跟技術面方向一致。")
+        elif inst_net > 0:
+            parts.append(f"但三大法人合計買超約{inst_net:.0f}張，籌碼面跟技術面方向不一致，需留意是否有主力進場承接。")
+        if margin_change > 3000:
+            parts.append(f"融資餘額短期增加約{margin_change:.0f}張，如果股價續跌可能引發融資追繳、多殺多，已在評分中加分反映。")
+    parts.append(f"綜合評分 {score:.1f} 分（分數只反映符合的訊號多寡，不是漲跌幅預測，尚未通過回測驗證，僅供觀察）。")
+    return "".join(parts)
 
 
 def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Candidate | None:
@@ -120,13 +179,28 @@ def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Can
             score += 10
             reasons.append("融資餘額高檔鬆動，可能引發多殺多(加分)")
 
+    score = round(score, 1)
+    name = str(row["name"]).strip() if "name" in row and row["name"] else stock_id
+    narrative = _narrate(
+        name=name,
+        direction=direction,
+        ma_state=ma_state,
+        pv_health=pv_health,
+        vol_exp=vol_exp,
+        inst_net=inst_net,
+        margin_change=margin_change,
+        score=score,
+    )
+
     return Candidate(
         stock_id=stock_id,
+        name=name,
         sector=row["sector"],
         direction=direction,
         price=float(row["close"]),
-        score=round(score, 1),
+        score=score,
         reasons=reasons,
+        narrative=narrative,
         ma_state=ma_state,
         volume_expansion=float(vol_exp) if not pd.isna(vol_exp) else float("nan"),
         institutional_net=inst_net,

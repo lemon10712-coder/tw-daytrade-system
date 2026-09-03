@@ -50,6 +50,38 @@ logger = logging.getLogger("stockSystem.real_providers")
 
 TWSE_BASE = "https://openapi.twse.com.tw/v1"
 TPEX_BASE = "https://www.tpex.org.tw/openapi/v1"
+
+# 產業分類代碼 -> 全名對照表。
+#
+# 背景：t187ap03_L（TWSE 上市公司基本資料）跟 mopsfin_t187ap03_O（TPEx 上櫃公司基本資料）
+# 的「產業別」欄位給的其實是兩碼的代碼（例如 "17"），不是可讀的族群名稱——這是
+# 2026-09-03 第三次真實環境查證才發現的（之前 build_snapshot 直接把這個代碼當成
+# sector 存進 ohlcv，導致報告上的族群欄位只會顯示「17」「03」這種代碼，使用者根本
+# 看不懂是什麼族群）。這份對照表是直接從 TWSE 官方查詢工具
+# https://isin.twse.com.tw/isin/class_i.jsp?kind=4 的「產業別」下拉選單抓下來、
+# 對照真實回應驗證過的（同一份代碼表上市/上櫃共用，已用 isin.twse.com.tw/isin/C_public.jsp
+# 的股票資料交叉核對過多檔上市股票，代碼與名稱一致）。
+SECTOR_CODE_NAME: dict[str, str] = {
+    "01": "水泥工業", "02": "食品工業", "03": "塑膠工業", "04": "紡織纖維",
+    "05": "電機機械", "06": "電器電纜", "08": "玻璃陶瓷", "09": "造紙工業",
+    "10": "鋼鐵工業", "11": "橡膠工業", "12": "汽車工業", "13": "電子工業",
+    "14": "建材營造業", "15": "航運業", "16": "觀光餐旅", "17": "金融保險業",
+    "18": "貿易百貨業", "19": "綜合", "20": "其他業", "21": "化學工業",
+    "22": "生技醫療業", "23": "油電燃氣業", "24": "半導體業", "25": "電腦及週邊設備業",
+    "26": "光電業", "27": "通信網路業", "28": "電子零組件業", "29": "電子通路業",
+    "30": "資訊服務業", "31": "其他電子業", "32": "文化創意業", "33": "農業科技業",
+    "35": "綠能環保", "36": "數位雲端", "37": "運動休閒", "38": "居家生活",
+}
+
+
+def sector_name_for_code(code: str) -> str:
+    """把產業分類代碼轉成可讀名稱；代碼不在對照表裡（例如已停用的代碼）就保留代碼本身，
+    讓使用者至少看得出「這是一個代碼」而不是誤以為是正常名稱，也方便回報。
+    """
+    code = (code or "").strip()
+    if not code:
+        return "未分類"
+    return SECTOR_CODE_NAME.get(code, f"未分類(代碼{code})")
 # 三大法人買賣超（T86）不在新版開放資料平台（openapi.twse.com.tw）上，只能從證交所
 # 舊版「盤後資訊」系統取得，回傳格式也不同（見下面 _rows_from_fields_data 的說明）。
 TWSE_LEGACY_BASE = "https://www.twse.com.tw/rwd/zh"
@@ -280,11 +312,23 @@ def fetch_daily_snapshot_dict(session, as_of: dt.date) -> dict:
     result["tpex_daily"] = tpex_daily
 
     # --- 產業別對照（用來做族群分類，規劃書第4節「族群強度」的基礎） ---
+    # 注意：t187ap03_L／mopsfin_t187ap03_O 的「產業別」欄位給的是兩碼代碼（例如 "17"），
+    # 不是可讀名稱，要另外用 SECTOR_CODE_NAME 轉換（見該常數的說明），build_snapshot 會做這件事。
     try:
         result["twse_industry"] = _get_json(session, f"{TWSE_BASE}/opendata/t187ap03_L")
     except Exception as exc:  # noqa: BLE001
         logger.warning("TWSE 產業別資料抓取失敗: %r", exc)
         result["twse_industry"] = []
+
+    # 2026-09-03 第三次真實環境查證後新增：之前只抓 TWSE（上市）的產業別，完全沒抓 TPEx
+    # （上櫃）的，導致所有上櫃股票的族群永遠是「未分類」。TPEx openapi 裡對應 t187ap03_L
+    # 的端點是 mopsfin_t187ap03_O（欄位是英文：SecuritiesCompanyCode／SecuritiesIndustryCode，
+    # 已對照真實回應驗證過，見該端點 swagger）。
+    try:
+        result["tpex_industry"] = _get_json(session, f"{TPEX_BASE}/mopsfin_t187ap03_O")
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("TPEx 產業別資料抓取失敗: %r", exc)
+        result["tpex_industry"] = []
 
     # --- 三大法人買賣超 ---
     # 注意：這個資料集不在 openapi.twse.com.tw（新版開放資料平台）上，要用證交所舊版
@@ -361,10 +405,42 @@ class DailySnapshotStore:
 # 把「一天的原始快照 dict」整理成當天各股的 row（供組 DataFrame 用）
 # ---------------------------------------------------------------------------
 
+def _pick_first_matching(row: dict, *token_groups: tuple) -> float:
+    """依序試過每一組 tokens，回傳第一組能在 row 裡找到欄位的解析結果；全部都找不到就回傳 nan。
+
+    這是為了同時兼容三種曾經在真實回應裡出現過的欄位命名慣例（見下面的呼叫端說明），
+    而不是只猜一種就假設一定對——這個檔案已經因為只猜一種格式吃過兩次虧了。
+    """
+    for tokens in token_groups:
+        if any(all(tok in k for tok in tokens) for k in row.keys()):
+            try:
+                return _to_float(row[_find_key(row, *tokens)])
+            except DataValidationError:
+                continue
+    return float("nan")
+
+
 def _parse_market_rows(raw_rows: list[dict], market_label: str) -> dict:
-    """回傳 {stock_id: {open, high, low, close, volume, name}}，成交量已經從「股」換算成「張」
-    （跟 FixtureProvider 的慣例一致，見 data_sources.py 裡 ScoringConfig.min_liquidity_avg_volume_lots
-    的單位假設）。
+    """回傳 {stock_id: {open, high, low, close, volume, name, market}}，成交量已經從「股」
+    換算成「張」（跟 FixtureProvider 的慣例一致，見 data_sources.py 裡
+    ScoringConfig.min_liquidity_avg_volume_lots 的單位假設）。
+
+    **2026-09-03 第三次真實環境查證後更新**：目前實際會流進這個函式的資料有三種欄位命名慣例，
+    缺一種都會讓那個來源的股票被悄悄解析成 nan（不會報錯，因為外層的 `_pick`/`_pick_first_matching`
+    找不到欄位時是回傳 nan，不是拋例外——這是刻意的，因為單一欄位缺漏不該讓整筆資料作廢）：
+
+    1. TWSE 新版 openapi（`STOCK_DAY_ALL`，每天的即時資料）：英文、`-ing`/`-est` 字尾，
+       例如 `OpeningPrice`／`ClosingPrice`／`TradeVolume`／`Name`。
+    2. TPEx 新版 openapi（`tpex_mainboard_daily_close_quotes`，每天的即時資料）：英文但是
+       **短字尾**，例如 `Open`／`Close`／`TradingShares`／`CompanyName`——這組跟第1種长得像
+       但欄位名稱其實不一樣，**之前這裡完全沒有處理這組，導致每天正式產生報告時，所有上櫃
+       股票的今日 open/high/low/close/volume 全部是 nan、均線/ATR 計算會被污染，這是候選清單
+       裡從來沒出現過上櫃股票的根因**，2026-09-03 直接對照真實回應才抓到。
+    3. TWSE／TPEx 舊版「盤後資訊」系統（回補歷史用，見 `_fetch_twse_day_all`／
+       `_fetch_tpex_day_all`）：中文欄位，例如 `開盤`／`收盤`／`成交股數`／`名稱`。
+
+    股票代號的判斷（`Code`／`SecuritiesCompanyCode`都含有 "Code" 這個子字串，`代號`則是中文
+    慣例)本來就已經涵蓋這三種來源，不需要改。
     """
     out = {}
     for row in raw_rows:
@@ -376,19 +452,25 @@ def _parse_market_rows(raw_rows: list[dict], market_label: str) -> dict:
         if not code:
             continue
 
-        def _pick(*tokens):
+        def _name_pick():
+            if "Name" in row:  # 精確比對，避免不小心吃到 "CompanyName" 這種也含有 Name 的欄位
+                return str(row["Name"]).strip()
+            if any("CompanyName" in k for k in row.keys()):
+                return str(row[_find_key(row, "CompanyName")]).strip()
             try:
-                return _to_float(row[_find_key(row, *tokens)])
+                return str(row[_find_key(row, "名稱")]).strip()
             except DataValidationError:
-                return float("nan")
+                return ""
 
-        volume_shares = _pick("Volume") if any("Volume" in k for k in row.keys()) else _pick("成交股數")
         out[code] = {
-            "open": _pick("Opening") if any("Opening" in k for k in row.keys()) else _pick("開盤"),
-            "high": _pick("Highest") if any("Highest" in k for k in row.keys()) else _pick("最高"),
-            "low": _pick("Lowest") if any("Lowest" in k for k in row.keys()) else _pick("最低"),
-            "close": _pick("Closing") if any("Closing" in k for k in row.keys()) else _pick("收盤"),
-            "volume": (volume_shares / 1000.0) if volume_shares == volume_shares else float("nan"),  # 股->張
+            "name": _name_pick(),
+            "open": _pick_first_matching(row, ("Opening",), ("Open",), ("開盤",)),
+            "high": _pick_first_matching(row, ("Highest",), ("High",), ("最高",)),
+            "low": _pick_first_matching(row, ("Lowest",), ("Low",), ("最低",)),
+            "close": _pick_first_matching(row, ("Closing",), ("Close",), ("收盤",)),
+            "volume": (
+                lambda shares: (shares / 1000.0) if shares == shares else float("nan")  # 股->張
+            )(_pick_first_matching(row, ("Volume",), ("TradingShares",), ("成交股數",))),
             "market": market_label,
         }
     return out
@@ -422,16 +504,29 @@ def build_snapshot(as_of: dt.date, history: list[dict]) -> MarketSnapshot:
     today_rows = _parse_market_rows(today_raw.get("twse_daily") or [], "TWSE")
     today_rows.update(_parse_market_rows(today_raw.get("tpex_daily") or [], "TPEx"))
 
-    # --- 產業別 ---
+    # --- 產業別：分別解析 TWSE(上市)／TPEx(上櫃) 的公司基本資料，兩邊欄位名稱不一樣
+    # （見 SECTOR_CODE_NAME 常數與 fetch_daily_snapshot_dict 的說明），代碼一律轉成可讀名稱
+    # 再存，這樣 ohlcv 的 "sector" 欄位跟這裡的 industry_map 才會一致（screen_sector 是拿
+    # sector_strength 算出來的 sector 名稱回頭去 industry_map 找同名的股票，兩邊沒對齊會
+    # 篩出 0 檔股票）。
     industry_map: dict[str, str] = {}
     for row in today_raw.get("twse_industry") or []:
         try:
             code = str(row[_find_key(row, "代號")]).strip()
-            sector = str(row[_find_key(row, "產業")]).strip()
-            if code and sector:
-                industry_map[code] = sector
+            industry_code = str(row[_find_key(row, "產業")]).strip()
+            if code and industry_code:
+                industry_map[code] = sector_name_for_code(industry_code)
         except DataValidationError:
             continue  # 產業別抓取失敗時不擋整體流程，見 self_check 的品質提示
+
+    for row in today_raw.get("tpex_industry") or []:
+        try:
+            code = str(row[_find_key(row, "SecuritiesCompanyCode")]).strip()
+            industry_code = str(row[_find_key(row, "SecuritiesIndustryCode")]).strip()
+            if code and industry_code:
+                industry_map[code] = sector_name_for_code(industry_code)
+        except DataValidationError:
+            continue  # 同上，TPEx 產業別抓取失敗時不擋整體流程
 
     # --- 組 ohlcv DataFrame ---
     ohlcv_rows = []
@@ -442,6 +537,7 @@ def build_snapshot(as_of: dt.date, history: list[dict]) -> MarketSnapshot:
         ohlcv_rows.append(
             {
                 "stock_id": stock_id,
+                "name": r.get("name") or stock_id,  # 抓不到名稱時至少顯示代號，不要顯示空字串
                 "sector": industry_map.get(stock_id, "未分類"),
                 "close": r["close"],
                 "prev_close": prev_close,
@@ -458,19 +554,38 @@ def build_snapshot(as_of: dt.date, history: list[dict]) -> MarketSnapshot:
     ohlcv = pd.DataFrame(ohlcv_rows).set_index("stock_id")
 
     # --- 三大法人 ---
+    # 2026-09-03 第三次真實環境查證後修正：T86 回傳的買賣超「股數」欄位單位是股，不是張，
+    # 但 `MarketSnapshot.institutional_flow` 的欄位說明跟 FixtureProvider 的合成資料（見
+    # data_sources.py，量級是幾千到幾萬）都是以「張」為單位，stock_screener.py 的評分公式
+    # 也是照「張」的量級校準的——這裡少做了股->張（除以1000）的換算，導致：
+    # (1) 報告上顯示的「三大法人買超xxx張」其實是股數，數字誇大了1000倍；
+    # (2) 評分公式 `min(inst_net/1000, 20)` 對真實資料而言幾乎必定瞬間打滿20分上限
+    #     （因為 inst_net 還是股數量級），法人籌碼分數形同虛設。
+    # 換算成張之後，兩邊都會回到原本設計時預期的量級，不需要再改 stock_screener.py。
+    # 外資淨買賣超也一併把「外陸資(不含外資自營商)」跟「外資自營商」兩個子項加總，
+    # 原本只取第一個子項，會低估真正的外資合計買賣超。
     inst_rows = []
     if today_raw.get("twse_institutional"):
         for row in today_raw["twse_institutional"]:
             try:
                 code = str(row[_find_key(row, "代號")]).strip()
-                foreign = _to_int(row[_find_key(row, "外", "買賣超")]) if any(
-                    "外" in k and "買賣超" in k for k in row.keys()
-                ) else 0
-                trust = _to_int(row[_find_key(row, "投信", "買賣超")]) if any(
-                    "投信" in k and "買賣超" in k for k in row.keys()
-                ) else 0
+                # 注意：「外陸資買賣超股數(不含外資自營商)」這個欄位名稱本身也含有
+                # "外資自營商" 這個子字串（在括號的排除說明裡），如果 foreign_dealer 用
+                # 一般的「包含子字串」比對，會兩個都比對到同一個「外陸資」欄位、把它算兩次、
+                # 完全漏掉真正的「外資自營商買賣超股數」欄位——這裡改用精確比對欄位名稱
+                # （已對照 T86 真實回應驗證過的確切欄位名稱），跟 dealer_keys 的作法一致。
+                foreign_ordinary_keys = [k for k in row.keys() if "外陸資買賣超股數" in k]
+                foreign_ordinary = _to_int(row[foreign_ordinary_keys[0]]) if foreign_ordinary_keys else 0
+                foreign_dealer_keys = [k for k in row.keys() if "外資自營商買賣超股數" == k]
+                foreign_dealer = _to_int(row[foreign_dealer_keys[0]]) if foreign_dealer_keys else 0
+                foreign = (foreign_ordinary + foreign_dealer) / 1000.0  # 股->張
+                trust = (
+                    _to_int(row[_find_key(row, "投信", "買賣超")]) if any(
+                        "投信" in k and "買賣超" in k for k in row.keys()
+                    ) else 0
+                ) / 1000.0  # 股->張
                 dealer_keys = [k for k in row.keys() if "自營商買賣超股數" == k]
-                dealer = _to_int(row[dealer_keys[0]]) if dealer_keys else 0
+                dealer = (_to_int(row[dealer_keys[0]]) if dealer_keys else 0) / 1000.0  # 股->張
                 inst_rows.append({"stock_id": code, "foreign_net": foreign, "trust_net": trust, "dealer_net": dealer})
             except (DataValidationError, KeyError):
                 continue

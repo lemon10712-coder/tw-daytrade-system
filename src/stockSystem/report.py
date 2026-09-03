@@ -122,6 +122,15 @@ def render_daily_report(
             lines.append("（今日無符合條件的候選股）")
             lines.append("")
             return
+        # 進出場的資料限制警語（日線近似VWAP、無法用日資料算開盤區間等）每一檔都完全一樣，
+        # 不是個股專屬的分析——之前每一檔候選股下面都完整重複這段警語，使用者反映看起來
+        # 像是「每一檔的推薦理由都是這段罐頭文字」。改成只在本節開頭講一次，個股底下的
+        # 進出場數字只留一個簡短的星號註記指回這裡，個股專屬的分析改看「見解」那一行
+        # （見 stock_screener._narrate）。
+        sample_ee = next((entry_exit_map.get(c.stock_id) for c in candidates if entry_exit_map.get(c.stock_id)), None)
+        if sample_ee:
+            lines.append(f"> ＊進出場價位的共同限制說明：{sample_ee.caveat}")
+            lines.append("")
         for c in candidates:
             gate = gate_results.get(c.stock_id)
             tier = gate.confidence_tier if gate else "unvalidated"
@@ -131,19 +140,19 @@ def render_daily_report(
                 "medium": "中信心",
                 "high": "高信心",
             }.get(tier, tier)
-            lines.append(f"### {c.stock_id}（{c.sector}，信心：{tier_label}）")
+            lines.append(f"### {c.stock_id}　{c.name}（{c.sector}，信心：{tier_label}）")
             lines.append(f"- 參考價: {c.price:.2f}　分數: {c.score}")
-            lines.append(f"- 依據: {'; '.join(c.reasons)}")
+            lines.append(f"- 見解: {c.narrative}")
+            lines.append(f"- 依據標籤: {'; '.join(c.reasons)}")
             if gate:
                 lines.append(f"- 驗證狀態: {'; '.join(gate.reasons)}")
             ee = entry_exit_map.get(c.stock_id)
             if ee:
                 lines.append(
-                    f"- 進場參考: {ee.entry_reference:.2f}（日線近似VWAP，見下方限制說明）"
+                    f"- 進場參考: {ee.entry_reference:.2f}（日線近似VWAP，見本節開頭＊）"
                 )
                 lines.append(f"- 止損參考: {ee.stop_price:.2f}（{ee.stop_basis}）")
                 lines.append(f"- 停利參考: {ee.target_price:.2f}（{ee.target_basis}）")
-                lines.append(f"- ⚠️ {ee.caveat}")
             lines.append("")
 
     render_candidates("3. 多方候選清單", long_candidates, long_entry_exit or {})
