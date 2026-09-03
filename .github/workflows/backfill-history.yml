@@ -3,7 +3,9 @@ name: 回補歷史每日快照（一次性/手動）
 # 只能手動觸發，不排程——這是一次性把 data/daily/ 補齊到 technicals.py 需要的視窗長度
 # （MA20、ATR14、量能擴張比基準期20天，見 scripts/backfill_history.py 說明），
 # 平常的每日報告已經有 daily-report.yml 自動處理，不需要每天重跑這個。
-# 冪等設計：已經有檔案的日期會跳過，重跑不會浪費額度重抓已成功的日期。
+# 冪等設計：已經有檔案的日期會跳過，重跑不會浪費額度重抓已成功的日期；
+# 同時也會補上之前 TPEx 抓失敗、只有 TWSE 資料的那些日期（見 scripts/refetch_tpex_history.py），
+# 不會重抓已經成功的 TWSE 部分。
 on:
   workflow_dispatch:
     inputs:
@@ -47,6 +49,14 @@ jobs:
           python scripts/backfill_history.py \
             --target-days "${{ github.event.inputs.target_days }}" \
             --max-calendar-days "${{ github.event.inputs.max_calendar_days }}"
+
+      - name: 補上之前 TPEx 抓失敗的部分（不影響已成功的 TWSE 資料）
+        # 就算還有少數幾天 TPEx 補不到（回傳非 0），也不該擋住下面把「已經成功補上的部分」
+        # commit/push 出去，所以這裡設 continue-on-error——失敗的細節看這個 step 自己的 log。
+        continue-on-error: true
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          python scripts/refetch_tpex_history.py
 
       - name: Commit 並 push 回補的快照
         run: |
