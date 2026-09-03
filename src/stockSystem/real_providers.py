@@ -191,27 +191,37 @@ def _fetch_tpex_day_all(session, as_of: dt.date) -> list[dict]:
     背景同 `_fetch_twse_day_all`：平常用的 `tpex_mainboard_daily_close_quotes` 只能查今天。
     TPEx 舊系統的日期格式是民國年（西元年 - 1911）的 YYY/MM/DD。
 
-    **可信度聲明**：這個端點的回傳格式沒有機會在這個沙盒環境驗證過（見檔案開頭的可信度聲明），
-    比 TWSE 那邊更不確定。刻意寫成防禦性：格式不符就清楚拋出 `DataValidationError`，
-    呼叫端（`backfill_history.py`）會把這天的 TPEx 資料當成「沒抓到」處理（tpex_daily 留空、
-    只記警告），不會擋住 TWSE 那部分的回補，也不會悄悄產生錯誤資料。
+    **2026-09-03 第一次在 GitHub Actions 真正執行後更新（已對照真實回應驗證過）**：
+    原本猜測的 `{"aaData": [...]}` 格式是錯的，實際回應長這樣：
+
+        {"date": "20260902",
+         "tables": [{"title": "上櫃股票行情", "fields": ["代號","名稱","收盤",...],
+                      "data": [["00411A","主動統一前沿科技","9.50",...], ...], ...}],
+         "flagField": ..., "stat": ...}
+
+    跟 TWSE 舊系統的 `{"fields","data"}` 形狀很像，只是多包了一層 "tables" 陣列——
+    這裡直接攤平每個 table 的 fields/data 成物件陣列（邏輯跟 `_rows_from_fields_data`
+    一樣，只是要先從 "tables" 裡取出來，所以沒有直接共用那個函式）。非交易日/假日時
+    "tables" 會是空陣列或缺欄位，一樣會被下面的防禦邏輯抓到、清楚報錯。
     """
     roc_year = as_of.year - 1911
     date_str = f"{roc_year}/{as_of.month:02d}/{as_of.day:02d}"
     raw = _get_json(session, f"{TPEX_LEGACY_BASE}/stk_quote_result.php?l=zh-tw&d={date_str}&se=EW")
-    if isinstance(raw, dict) and isinstance(raw.get("aaData"), list):
-        # TPEx 舊系統常見格式：{"aaData": [[代號, 名稱, 收盤, 漲跌, ...], ...]}，
-        # 欄位名稱另外放在 "reportTitle" 之類的地方、不是每列資料都有欄位名——
-        # 這裡先用已知的欄位順序猜測，猜錯會在 _parse_market_rows 找不到關鍵欄位時報錯，
-        # 而不是悄悄用錯資料（見 real_providers.py 開頭的可信度聲明）。
-        fields = ["代號", "名稱", "收盤價", "漲跌", "漲跌百分比", "開盤價", "最高價", "最低價", "成交股數", "成交金額", "成交筆數"]
-        rows = raw["aaData"]
-        return [dict(zip(fields, row)) for row in rows]
+    tables = raw.get("tables") if isinstance(raw, dict) else None
+    if isinstance(tables, list) and tables:
+        rows: list[dict] = []
+        for table in tables:
+            fields = table.get("fields") or []
+            data_rows = table.get("data") or []
+            if not fields or not data_rows:
+                continue
+            rows.extend(dict(zip(fields, row)) for row in data_rows)
+        if rows:
+            return rows
     raise DataValidationError(
-        f"TPEx 每日收盤行情（{date_str}）回應格式不是預期的 {{'aaData': [...]}}，"
+        f"TPEx 每日收盤行情（{date_str}）回應裡沒有可用的 tables 資料，"
         f"實際回應的 top-level key 有：{sorted(raw.keys()) if isinstance(raw, dict) else type(raw)}。"
-        "代表 TPEx 舊系統的回傳格式跟這裡假設的不一樣，需要對照這次錯誤訊息更新 "
-        "_fetch_tpex_day_all，這個端點的格式沒有機會在沙盒環境驗證過，見檔案開頭聲明。"
+        "可能是非交易日/假日、或格式又跟這裡假設的不一樣，需要對照這次錯誤訊息確認。"
     )
 
 
