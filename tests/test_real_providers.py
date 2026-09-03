@@ -222,11 +222,21 @@ class _FakeSessionForBackfill:
             if date_str in self._twse_ok_dates:
                 payload = {
                     "stat": "OK",
-                    "fields": ["證券代號", "證券名稱", "開盤價", "最高價", "最低價", "收盤價", "成交股數"],
-                    "data": [["2330", "台積電", "900", "910", "895", "905", "19783000"]],
+                    "tables": [
+                        {
+                            "title": f"{date_str} 價格指數(臺灣證券交易所)",
+                            "fields": ["指數", "收盤指數"],
+                            "data": [["發行量加權股價指數", "20000"]],
+                        },
+                        {
+                            "title": f"{date_str} 每日收盤行情(全部)",
+                            "fields": ["證券代號", "證券名稱", "開盤價", "最高價", "最低價", "收盤價", "成交股數"],
+                            "data": [["2330", "台積電", "900", "910", "895", "905", "19783000"]],
+                        },
+                    ],
                 }
             else:
-                payload = {"stat": "很抱歉，沒有符合條件的資料!", "fields": [], "data": []}
+                payload = {"stat": "很抱歉，沒有符合條件的資料!", "tables": []}
             return _FakeResponse(payload)
         if "daily_close_quotes" in url:
             date_str = url.split("d=")[1].split("&")[0]
@@ -254,9 +264,11 @@ class _FakeSessionForBackfill:
 
 
 def test_fetch_twse_day_all_converts_legacy_mi_index_format():
-    """MI_INDEX 是回補歷史用的『指定日期』版本，格式跟 T86 一樣是 fields/data 分開，
-    這裡鎖住轉換邏輯，且轉出來的中文欄位要能被 _parse_market_rows 認得（見該函式的
-    英文/中文 fallback 設計，不需要另外改介面）。
+    """2026-09-03 第二次真實執行後確認的實際格式：MI_INDEX（帶 type=ALL）回傳的是
+    `{"stat","tables":[{...}, ...]}`，資料被拆成好幾個表格（指數、報酬指數、每日收盤行情…），
+    不是原本猜測的扁平 `{"stat","fields","data"}`——這裡鎖住「從 tables 裡找出標題含
+    『每日收盤行情』的那個表格」的邏輯，且轉出來的中文欄位要能被 _parse_market_rows 認得
+    （見該函式的英文/中文 fallback 設計，不需要另外改介面）。
     """
     session = _FakeSessionForBackfill(twse_ok_dates={"20260902"}, tpex_ok_dates=set())
     rows = _fetch_twse_day_all(session, dt.date(2026, 9, 2))
