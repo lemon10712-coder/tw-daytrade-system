@@ -45,3 +45,32 @@ def test_screen_sector_candidates_sorted_descending_by_score():
     candidates, _ = screen_sector(snapshot, "光通訊", "long")
     scores = [c.score for c in candidates]
     assert scores == sorted(scores, reverse=True)
+
+
+def test_hard_filters_excludes_stock_priced_below_min_price_twd():
+    """2026-09-03 使用者要求：只列股價100元以上的股票。"""
+    snapshot = FixtureProvider(seed=42).get_snapshot(dt.date.today())
+    cheap_stock = next(
+        sid for sid in snapshot.industry_map if snapshot.ohlcv.loc[sid]["close"] < 100.0
+    )
+    result = hard_filters(cheap_stock, snapshot, "long")
+    assert result.excluded is True
+    assert any("股價低於100元門檻" in r for r in result.reasons)
+
+
+def test_hard_filters_does_not_exclude_stock_priced_above_min_price_twd_on_price_grounds():
+    snapshot = FixtureProvider(seed=42).get_snapshot(dt.date.today())
+    pricey_stock = next(
+        sid for sid in snapshot.industry_map if snapshot.ohlcv.loc[sid]["close"] >= 100.0
+    )
+    result = hard_filters(pricey_stock, snapshot, "long")
+    assert not any("股價低於" in r for r in result.reasons)
+
+
+def test_screen_sector_never_returns_sub_100_stock_as_candidate():
+    snapshot = FixtureProvider(seed=42).get_snapshot(dt.date.today())
+    for sector in {"光通訊", "半導體", "傳產", "航運"}:
+        for direction in ("long", "short"):
+            candidates, _ = screen_sector(snapshot, sector, direction)
+            for c in candidates:
+                assert c.price >= 100.0
