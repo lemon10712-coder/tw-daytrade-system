@@ -234,12 +234,21 @@ class _FakeSessionForBackfill:
                 return _FakeResponse({"unexpectedKey": []})
             if date_str in self._tpex_ok_dates:
                 payload = {
-                    "aaData": [
-                        ["6488", "环球晶", "500", "5", "1.01%", "495", "505", "490", "3000000", "1500000000", "1200"],
-                    ]
+                    "date": date_str.replace("/", ""),
+                    "tables": [
+                        {
+                            "title": "上櫃股票行情",
+                            "fields": ["代號", "名稱", "收盤", "漲跌", "開盤", "最高", "最低", "成交股數"],
+                            "data": [
+                                ["6488", "环球晶", "500", "5", "495", "505", "490", "3000000"],
+                            ],
+                        }
+                    ],
+                    "flagField": "",
+                    "stat": "ok",
                 }
             else:
-                payload = {"aaData": []}
+                payload = {"date": date_str.replace("/", ""), "tables": [], "flagField": "", "stat": "ok"}
             return _FakeResponse(payload)
         raise AssertionError(f"unexpected URL in test fake session: {url}")
 
@@ -271,13 +280,23 @@ def test_fetch_twse_day_all_raises_clearly_when_non_trading_day():
         _fetch_twse_day_all(session, dt.date(2026, 9, 6))  # 週日
 
 
-def test_fetch_tpex_day_all_converts_aadata_format():
+def test_fetch_tpex_day_all_converts_tables_format():
+    """2026-09-03 真實執行後確認的實際格式：{"tables": [{"fields": [...], "data": [[...]]}]}，
+    不是原本猜測的 {"aaData": [...]}——這裡鎖住對照真實回應改寫後的轉換邏輯。"""
     session = _FakeSessionForBackfill(twse_ok_dates=set(), tpex_ok_dates={"115/09/02"})
     rows = _fetch_tpex_day_all(session, dt.date(2026, 9, 2))
     assert rows[0]["代號"] == "6488"
-    assert rows[0]["收盤價"] == "500"
+    assert rows[0]["收盤"] == "500"
     # 民國年轉換要正確：2026 - 1911 = 115
     assert any("d=115/09/02" in u for u in session.requested_urls)
+
+
+def test_fetch_tpex_day_all_raises_clearly_when_tables_empty():
+    """非交易日/假日時 tables 會是空陣列，不該被解析成『0 檔股票』悄悄放行，要清楚報錯，
+    讓呼叫端（backfill_history.py）當成『這天沒抓到』處理。"""
+    session = _FakeSessionForBackfill(twse_ok_dates=set(), tpex_ok_dates=set())
+    with pytest.raises(DataValidationError):
+        _fetch_tpex_day_all(session, dt.date(2026, 9, 6))  # 週日，tpex_ok_dates 沒有這天
 
 
 def test_fetch_tpex_day_all_raises_clearly_when_format_unexpected():
