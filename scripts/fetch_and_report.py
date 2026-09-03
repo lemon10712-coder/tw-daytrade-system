@@ -4,7 +4,7 @@
 - `run_daily_report.py` 是給這個 Claude Cowork 雲端沙盒用的，只能用 `--source fixture`
   （沙盒連不到外部網路，見 KNOWN_ISSUES.md）。
 - 這個檔案是給 **GitHub Actions**（或任何有正常對外網路的環境）用的，會真的打
-TWSE／TPEx OpenAPI 抓當天的真實資料、存進 data/daily/ 累積歷史、再產生報告。
+  TWSE／TPEx OpenAPI 抓當天的真實資料、存進 data/daily/ 累積歷史、再產生報告。
 
 用法（在 repo 根目錄執行）：
     python scripts/fetch_and_report.py
@@ -100,7 +100,11 @@ def main() -> int:
 
     market_return_by_window = {3: 0.0, 5: 0.0, 10: 0.0}  # 大盤加權指數的多天期報酬率，之後可另外接入取代0
     scores = compute_sector_scores(snapshot.ohlcv, market_return_by_window)
-    scores = apply_macro_overlay(scores, snapshot.intl_snapshot, semiconductor_sectors={"半導體", "通訊網路", "電子零組件"})
+    # 2026-09-03：sector 現在存的是 real_providers.SECTOR_CODE_NAME 解析出來的官方全名
+    # （例如「半導體業」），不再是族群代碼，這裡要對齊，不然這個修正條件永遠不會命中。
+    scores = apply_macro_overlay(
+        scores, snapshot.intl_snapshot, semiconductor_sectors={"半導體業", "通信網路業", "電子零組件業"}
+    )
     strongest, weakest = rank_sectors(scores)
     log.info("族群強度排名完成，最強=%s，最弱=%s", strongest[0].sector, weakest[0].sector)
 
@@ -157,6 +161,7 @@ def main() -> int:
         "long_candidates": [
             {
                 "stock_id": c.stock_id,
+                "name": c.name,
                 "sector": c.sector,
                 "score": c.score,
                 "entry": long_ee[c.stock_id].entry_reference if c.stock_id in long_ee else None,
@@ -168,6 +173,7 @@ def main() -> int:
         "short_candidates": [
             {
                 "stock_id": c.stock_id,
+                "name": c.name,
                 "sector": c.sector,
                 "score": c.score,
                 "entry": short_ee[c.stock_id].entry_reference if c.stock_id in short_ee else None,
