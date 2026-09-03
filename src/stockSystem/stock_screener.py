@@ -61,6 +61,10 @@ def hard_filters(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Exc
     if avg_vol_lots < SCORING.min_liquidity_avg_volume_lots:
         reasons.append(f"近20日均量過低({avg_vol_lots:.0f}張 < 門檻{SCORING.min_liquidity_avg_volume_lots}張)")
 
+    close_price = row["close"]
+    if pd.notna(close_price) and close_price < SCORING.min_price_twd:
+        reasons.append(f"股價低於{SCORING.min_price_twd:.0f}元門檻({close_price:.2f}元)")
+
     return ExclusionResult(stock_id=stock_id, excluded=bool(reasons), reasons=reasons)
 
 

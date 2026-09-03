@@ -65,6 +65,7 @@ class ScoringConfig:
     ma_windows: tuple = (5, 10, 20, 60)
     atr_window: int = 14
     min_liquidity_avg_volume_lots: int = 200  # 近20日均量門檻（單位：張），排除流動性太差的股票
+    min_price_twd: float = 100.0  # 2026-09-03 使用者要求：只列股價100元以上的股票（用當天收盤價判斷）
 
 
 ACCOUNT = AccountConfig()

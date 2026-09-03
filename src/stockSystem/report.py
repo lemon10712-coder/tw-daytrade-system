@@ -149,7 +149,9 @@ def render_daily_report(
             ee = entry_exit_map.get(c.stock_id)
             if ee:
                 lines.append(
-                    f"- 進場參考: {ee.entry_reference:.2f}（日線近似VWAP，見本節開頭＊）"
+                    f"- 進場參考: {ee.entry_reference:.2f}"
+                    f"（以前一交易日收盤價{ee.prev_close:.2f}算出的日線近似樞紐價，"
+                    "是否觸及視今日走勢而定、不保證一定成交，見本節開頭＊）"
                 )
                 lines.append(f"- 止損參考: {ee.stop_price:.2f}（{ee.stop_basis}）")
                 lines.append(f"- 停利參考: {ee.target_price:.2f}（{ee.target_basis}）")
