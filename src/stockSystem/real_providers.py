@@ -53,6 +53,9 @@ TPEX_BASE = "https://www.tpex.org.tw/openapi/v1"
 # 三大法人買賣超（T86）不在新版開放資料平台（openapi.twse.com.tw）上，只能從證交所
 # 舊版「盤後資訊」系統取得，回傳格式也不同（見下面 _rows_from_fields_data 的說明）。
 TWSE_LEGACY_BASE = "https://www.twse.com.tw/rwd/zh"
+# TPEx（櫃買中心）舊版系統，用來回補歷史每日行情（新版 openapi 的 daily_close_quotes
+# 沒有日期參數，只能查「今天」，見 _fetch_tpex_day_all 說明）。
+TPEX_LEGACY_BASE = "https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes"
 
 # 2026-09-02 第一次在 GitHub Actions 真正執行後發現：requests 預設的 User-Agent 會被
 # Yahoo Finance 判定為爬蟲、對 GitHub Actions 的共用 IP 回傳 429 Too Many Requests。
@@ -159,6 +162,57 @@ def _fetch_institutional_flow_with_lookback(
             logger.info("TWSE 三大法人買賣超 %s 沒有已公布的資料，往前找上一個交易日: %r", date_str, exc)
             continue
     return None
+
+
+def _fetch_twse_day_all(session, as_of: dt.date) -> list[dict]:
+    """查 TWSE 舊版「盤後資訊」系統的每日收盤行情（MI_INDEX），拿「指定某一天」全部上市股票的資料。
+
+    背景：`fetch_daily_snapshot_dict` 平常用的 `openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL`
+    只能查「今天」，沒有日期參數，沒辦法拿來回補過去的歷史快照。MI_INDEX 是同一套舊系統
+    （跟 T86 三大法人一樣，見 TWSE_LEGACY_BASE 說明）的「指定日期」版本，回傳格式也是
+    `{"stat","fields","data"}`，用 `_rows_from_fields_data` 轉成物件陣列。
+    轉出來的物件陣列欄位是中文（如「證券代號」「收盤價」），`_parse_market_rows` 本來就設計成
+    英文/中文欄位都認得（見該函式的 `_pick` fallback），不需要另外改介面。
+
+    只給 `scripts/backfill_history.py`（一次性回補歷史）用；平常的每日抓取不需要指定日期，
+    繼續用 STOCK_DAY_ALL。尚未在真實環境驗證過欄位名稱是否跟預期一致，第一次真正執行
+    `backfill_history.py` 時如果欄位對不上，`_find_key` 會清楚報錯並列出實際欄位。
+    """
+    date_str = as_of.strftime("%Y%m%d")
+    raw = _get_json(
+        session, f"{TWSE_LEGACY_BASE}/afterTrading/MI_INDEX?date={date_str}&type=ALL&response=json"
+    )
+    return _rows_from_fields_data(raw, f"TWSE 每日收盤行情(MI_INDEX, {date_str})")
+
+
+def _fetch_tpex_day_all(session, as_of: dt.date) -> list[dict]:
+    """查 TPEx（櫃買中心）舊版系統的每日收盤行情，拿「指定某一天」全部上櫃股票的資料。
+
+    背景同 `_fetch_twse_day_all`：平常用的 `tpex_mainboard_daily_close_quotes` 只能查今天。
+    TPEx 舊系統的日期格式是民國年（西元年 - 1911）的 YYY/MM/DD。
+
+    **可信度聲明**：這個端點的回傳格式沒有機會在這個沙盒環境驗證過（見檔案開頭的可信度聲明），
+    比 TWSE 那邊更不確定。刻意寫成防禦性：格式不符就清楚拋出 `DataValidationError`，
+    呼叫端（`backfill_history.py`）會把這天的 TPEx 資料當成「沒抓到」處理（tpex_daily 留空、
+    只記警告），不會擋住 TWSE 那部分的回補，也不會悄悄產生錯誤資料。
+    """
+    roc_year = as_of.year - 1911
+    date_str = f"{roc_year}/{as_of.month:02d}/{as_of.day:02d}"
+    raw = _get_json(session, f"{TPEX_LEGACY_BASE}/stk_quote_result.php?l=zh-tw&d={date_str}&se=EW")
+    if isinstance(raw, dict) and isinstance(raw.get("aaData"), list):
+        # TPEx 舊系統常見格式：{"aaData": [[代號, 名稱, 收盤, 漲跌, ...], ...]}，
+        # 欄位名稱另外放在 "reportTitle" 之類的地方、不是每列資料都有欄位名——
+        # 這裡先用已知的欄位順序猜測，猜錯會在 _parse_market_rows 找不到關鍵欄位時報錯，
+        # 而不是悄悄用錯資料（見 real_providers.py 開頭的可信度聲明）。
+        fields = ["代號", "名稱", "收盤價", "漲跌", "漲跌百分比", "開盤價", "最高價", "最低價", "成交股數", "成交金額", "成交筆數"]
+        rows = raw["aaData"]
+        return [dict(zip(fields, row)) for row in rows]
+    raise DataValidationError(
+        f"TPEx 每日收盤行情（{date_str}）回應格式不是預期的 {{'aaData': [...]}}，"
+        f"實際回應的 top-level key 有：{sorted(raw.keys()) if isinstance(raw, dict) else type(raw)}。"
+        "代表 TPEx 舊系統的回傳格式跟這裡假設的不一樣，需要對照這次錯誤訊息更新 "
+        "_fetch_tpex_day_all，這個端點的格式沒有機會在沙盒環境驗證過，見檔案開頭聲明。"
+    )
 
 
 # ---------------------------------------------------------------------------
