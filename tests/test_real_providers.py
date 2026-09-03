@@ -15,6 +15,8 @@ from stockSystem.data_sources import DataValidationError
 from stockSystem.real_providers import (
     DailySnapshotStore,
     _fetch_institutional_flow_with_lookback,
+    _fetch_tpex_day_all,
+    _fetch_twse_day_all,
     _find_key,
     _parse_market_rows,
     _rows_from_fields_data,
@@ -199,6 +201,96 @@ def test_fetch_institutional_flow_with_lookback_gives_up_after_max_days():
     rows = _fetch_institutional_flow_with_lookback(session, as_of, max_lookback_days=3)
     assert rows is None
     assert len(session.requested_urls) == 3
+
+
+class _FakeSessionForBackfill:
+    """模擬 MI_INDEX（TWSE 指定日期全市場行情）跟 TPEx 舊系統的每日收盤行情，
+    用來測試 `backfill_history.py` 用的兩個回補函式（`_fetch_twse_day_all` /
+    `_fetch_tpex_day_all`）在正常情況、以及格式不符時的行為。
+    """
+
+    def __init__(self, twse_ok_dates: set[str], tpex_ok_dates: set[str], tpex_bad_format_dates: set[str] = frozenset()):
+        self._twse_ok_dates = twse_ok_dates
+        self._tpex_ok_dates = tpex_ok_dates
+        self._tpex_bad_format_dates = tpex_bad_format_dates
+        self.requested_urls: list[str] = []
+
+    def get(self, url, timeout=30, headers=None):
+        self.requested_urls.append(url)
+        if "afterTrading/MI_INDEX" in url:
+            date_str = url.split("date=")[1].split("&")[0]
+            if date_str in self._twse_ok_dates:
+                payload = {
+                    "stat": "OK",
+                    "fields": ["證券代號", "證券名稱", "開盤價", "最高價", "最低價", "收盤價", "成交股數"],
+                    "data": [["2330", "台積電", "900", "910", "895", "905", "19783000"]],
+                }
+            else:
+                payload = {"stat": "很抱歉，沒有符合條件的資料!", "fields": [], "data": []}
+            return _FakeResponse(payload)
+        if "daily_close_quotes" in url:
+            date_str = url.split("d=")[1].split("&")[0]
+            if date_str in self._tpex_bad_format_dates:
+                return _FakeResponse({"unexpectedKey": []})
+            if date_str in self._tpex_ok_dates:
+                payload = {
+                    "aaData": [
+                        ["6488", "环球晶", "500", "5", "1.01%", "495", "505", "490", "3000000", "1500000000", "1200"],
+                    ]
+                }
+            else:
+                payload = {"aaData": []}
+            return _FakeResponse(payload)
+        raise AssertionError(f"unexpected URL in test fake session: {url}")
+
+
+def test_fetch_twse_day_all_converts_legacy_mi_index_format():
+    """MI_INDEX 是回補歷史用的『指定日期』版本，格式跟 T86 一樣是 fields/data 分開，
+    這裡鎖住轉換邏輯，且轉出來的中文欄位要能被 _parse_market_rows 認得（見該函式的
+    英文/中文 fallback 設計，不需要另外改介面）。
+    """
+    session = _FakeSessionForBackfill(twse_ok_dates={"20260902"}, tpex_ok_dates=set())
+    rows = _fetch_twse_day_all(session, dt.date(2026, 9, 2))
+    assert rows == [
+        {
+            "證券代號": "2330", "證券名稱": "台積電", "開盤價": "900", "最高價": "910",
+            "最低價": "895", "收盤價": "905", "成交股數": "19783000",
+        }
+    ]
+    parsed = _parse_market_rows(rows, "TWSE")
+    assert parsed["2330"]["close"] == 905.0
+    assert parsed["2330"]["volume"] == pytest.approx(19783.0)  # 股 -> 張
+
+
+def test_fetch_twse_day_all_raises_clearly_when_non_trading_day():
+    """非交易日（假日/週末）查 MI_INDEX 會拿到 stat 不是 OK，要清楚報錯而不是回傳空清單，
+    這樣呼叫端（backfill_history.py）才能正確判斷「這天跳過」而不是「這天沒有任何股票交易」。
+    """
+    session = _FakeSessionForBackfill(twse_ok_dates=set(), tpex_ok_dates=set())
+    with pytest.raises(DataValidationError):
+        _fetch_twse_day_all(session, dt.date(2026, 9, 6))  # 週日
+
+
+def test_fetch_tpex_day_all_converts_aadata_format():
+    session = _FakeSessionForBackfill(twse_ok_dates=set(), tpex_ok_dates={"115/09/02"})
+    rows = _fetch_tpex_day_all(session, dt.date(2026, 9, 2))
+    assert rows[0]["代號"] == "6488"
+    assert rows[0]["收盤價"] == "500"
+    # 民國年轉換要正確：2026 - 1911 = 115
+    assert any("d=115/09/02" in u for u in session.requested_urls)
+
+
+def test_fetch_tpex_day_all_raises_clearly_when_format_unexpected():
+    """TPEx 舊系統的回傳格式沒有機會在沙盒環境驗證過，格式不符時要清楚報錯、列出實際拿到的
+    key，讓 backfill_history.py 把這天的 TPEx 資料當成『沒抓到』處理，而不是悄悄用錯資料
+    (見 _fetch_tpex_day_all 的可信度聲明)。
+    """
+    session = _FakeSessionForBackfill(
+        twse_ok_dates=set(), tpex_ok_dates=set(), tpex_bad_format_dates={"115/09/02"}
+    )
+    with pytest.raises(DataValidationError) as exc_info:
+        _fetch_tpex_day_all(session, dt.date(2026, 9, 2))
+    assert "unexpectedKey" in str(exc_info.value)
 
 
 def test_daily_snapshot_store_load_recent_skips_missing_days(tmp_path):
