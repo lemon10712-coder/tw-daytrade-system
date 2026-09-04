@@ -63,6 +63,17 @@ def hard_filters(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Exc
         reasons.append("查無當日價格資料(可能為新上市/暫停交易/資料缺漏)")
         return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)
 
+    if stock_id not in snapshot.institutional_flow.index:
+        # 同樣的資料缺角問題，但發生在三大法人買賣超資料——_score_stock 之後會直接
+        # 用 .loc[stock_id] 存取這份資料，缺了就先排除，理由同上。
+        reasons.append("查無當日三大法人買賣超資料(可能為新上市/暫停交易/資料缺漏)")
+        return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)
+
+    if stock_id not in snapshot.margin_data.index:
+        # 同樣的資料缺角問題，但發生在融資餘額資料。
+        reasons.append("查無當日融資餘額資料(可能為新上市/暫停交易/資料缺漏)")
+        return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)
+
     row = snapshot.ohlcv.loc[stock_id]
     avg_vol_lots = row["volume_hist"][-20:].mean() if len(row["volume_hist"]) >= 20 else 0
     if avg_vol_lots < SCORING.min_liquidity_avg_volume_lots:
