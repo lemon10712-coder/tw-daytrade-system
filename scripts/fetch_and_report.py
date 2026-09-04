@@ -109,15 +109,15 @@ def main() -> int:
     log.info("族群強度排名完成，最強=%s，最弱=%s", strongest[0].sector, weakest[0].sector)
 
     long_candidates = []
-    short_candidates = []
+    # 2026-09-04 使用者明確要求：只篩選最強族群的多方候選，最弱族群的放空(空方)篩選先不用——
+    # 不是「篩不出來」，是刻意不篩，所以這裡固定給空清單，不呼叫 screen_sector(..., "short")。
+    # 之後如果使用者想恢復空方篩選，把下面這段迴圈（仿照多方那段，改成 weakest[:3] / "short"）
+    # 加回來即可，不需要動 stock_screener.py 或 report.py 的邏輯。
+    short_candidates: list = []
     for s in strongest[:3]:
         cands, excluded = screen_sector(snapshot, s.sector, "long")
         log.info("多方篩選 %s：候選 %d 檔，排除 %d 檔", s.sector, len(cands), len(excluded))
         long_candidates.extend(cands[:3])
-    for s in weakest[:3]:
-        cands, excluded = screen_sector(snapshot, s.sector, "short")
-        log.info("空方篩選 %s：候選 %d 檔，排除 %d 檔", s.sector, len(cands), len(excluded))
-        short_candidates.extend(cands[:3])
 
     # 回測晉升門檻的真正串接（用 state/rule_registry.json 的歷史紀錄）留待累積夠多真實交易日資料後再接，
     # 目前累積的歷史天數如果還不夠 backtest.py 的 min_sample_size，一律誠實標示 unvalidated，
