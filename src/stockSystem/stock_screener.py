@@ -56,7 +56,12 @@ def hard_filters(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Exc
     if direction == "short" and stock_id not in snapshot.daytrade_short_eligible:
         reasons.append("當日不具先賣後買(放空)當沖資格")
 
-    row = snapshot.ohlcv.loc[stock_id]
+        if stock_id not in snapshot.ohlcv.index:
+        # 產業分類名單裡有這檔股票，但當日價格資料缺漏（常見於新上市、暫停交易、
+        # 或資料來源當天沒有這檔的成交資訊）——排除掉，避免整份報告因單一股票
+        # 資料缺角而全部中斷（呼應本檔案開頭「硬性排除一律先做」的設計原則）。
+        reasons.append("查無當日價格資料(可能為新上市/暫停交易/資料缺漏)")
+        return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)row = snapshot.ohlcv.loc[stock_id]
     avg_vol_lots = row["volume_hist"][-20:].mean() if len(row["volume_hist"]) >= 20 else 0
     if avg_vol_lots < SCORING.min_liquidity_avg_volume_lots:
         reasons.append(f"近20日均量過低({avg_vol_lots:.0f}張 < 門檻{SCORING.min_liquidity_avg_volume_lots}張)")
