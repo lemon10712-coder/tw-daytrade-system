@@ -116,10 +116,10 @@ def render_daily_report(
         )
     lines.append("")
 
-    def render_candidates(title: str, candidates: list, entry_exit_map: dict) -> None:
+    def render_candidates(title: str, candidates: list, entry_exit_map: dict, empty_note: str | None = None) -> None:
         lines.append(f"## {title}")
         if not candidates:
-            lines.append("（今日無符合條件的候選股）")
+            lines.append(empty_note or "（今日無符合條件的候選股）")
             lines.append("")
             return
         # 進出場的資料限制警語（日線近似VWAP、無法用日資料算開盤區間等）每一檔都完全一樣，
@@ -158,7 +158,12 @@ def render_daily_report(
             lines.append("")
 
     render_candidates("3. 多方候選清單", long_candidates, long_entry_exit or {})
-    render_candidates("4. 空方候選清單", short_candidates, short_entry_exit or {})
+    render_candidates(
+        "4. 空方候選清單",
+        short_candidates,
+        short_entry_exit or {},
+        empty_note="（依使用者指示，本次分析不篩選放空(空方)候選——只針對最強族群做多方篩選，2026-09-04 起停用最弱族群的空方篩選）",
+    )
 
     lines.append("## 5. 資金配置建議組合")
     if not combos:
