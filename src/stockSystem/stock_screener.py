@@ -63,17 +63,6 @@ def hard_filters(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Exc
         reasons.append("查無當日價格資料(可能為新上市/暫停交易/資料缺漏)")
         return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)
 
-    if stock_id not in snapshot.institutional_flow.index:
-        # 同樣的資料缺角問題，但發生在三大法人買賣超資料——_score_stock 之後會直接
-        # 用 .loc[stock_id] 存取這份資料，缺了就先排除，理由同上。
-        reasons.append("查無當日三大法人買賣超資料(可能為新上市/暫停交易/資料缺漏)")
-        return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)
-
-    if stock_id not in snapshot.margin_data.index:
-        # 同樣的資料缺角問題，但發生在融資餘額資料。
-        reasons.append("查無當日融資餘額資料(可能為新上市/暫停交易/資料缺漏)")
-        return ExclusionResult(stock_id=stock_id, excluded=True, reasons=reasons)
-
     row = snapshot.ohlcv.loc[stock_id]
     avg_vol_lots = row["volume_hist"][-20:].mean() if len(row["volume_hist"]) >= 20 else 0
     if avg_vol_lots < SCORING.min_liquidity_avg_volume_lots:
@@ -152,12 +141,26 @@ def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Can
     vol_exp = volume_expansion_ratio(volume_hist)
     pv_health = price_volume_health(close_hist, volume_hist)
 
-    inst = snapshot.institutional_flow.loc[stock_id]
-    inst_net = float(inst["foreign_net"] + inst["trust_net"] + inst["dealer_net"])
-
-    margin_change = float(snapshot.margin_data.loc[stock_id]["margin_change"])
-
     reasons = []
+
+    if stock_id in snapshot.institutional_flow.index:
+        inst = snapshot.institutional_flow.loc[stock_id]
+        inst_net = float(inst["foreign_net"] + inst["trust_net"] + inst["dealer_net"])
+    else:
+        # 三大法人資料當天缺漏（可能是資料源解析失敗，不代表這檔股票真的沒有法人動向）——
+        # 視為中性、不加分不扣分，而不是直接排除整檔股票。2026-09-04 就是活生生的教訓：
+        # 一改成「hard_filters 裡缺資料就直接排除」，三大法人資料當天解析失敗導致全部
+        # 股票被排除，多空候選清單雙雙掛零，比原本會 KeyError 崩潰還糟——這裡改成在
+        # 評分層面優雅降級，缺資料只是這個次要訊號不計分，不影響其他技術面判斷。
+        inst_net = 0.0
+        reasons.append("三大法人買賣超資料缺漏，籌碼面本次未列入評分")
+
+    if stock_id in snapshot.margin_data.index:
+        margin_change = float(snapshot.margin_data.loc[stock_id]["margin_change"])
+    else:
+        margin_change = 0.0
+        reasons.append("融資餘額資料缺漏，資券面本次未列入評分")
+
     score = 0.0
 
     if direction == "long":
