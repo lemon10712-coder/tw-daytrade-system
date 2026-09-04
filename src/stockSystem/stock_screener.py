@@ -13,7 +13,7 @@ import pandas as pd
 from stockSystem.config import SCORING
 from stockSystem.data_sources import MarketSnapshot
 from stockSystem.technicals import (
-    ma_alignment,
+    ma_alignment_ratio,
     price_volume_health,
     volume_expansion_ratio,
 )
@@ -79,6 +79,7 @@ def _narrate(
     name: str,
     direction: str,
     ma_state: str,
+    ma_ratio: float,
     pv_health: str,
     vol_exp: float,
     inst_net: float,
@@ -95,7 +96,10 @@ def _narrate(
     """
     parts = []
     if direction == "long":
-        parts.append(f"{name}目前站上短中期均線且呈多頭排列，技術面偏多。")
+        if ma_ratio >= 0.99:
+            parts.append(f"{name}目前站上短中期均線且呈多頭排列，技術面偏多。")
+        else:
+            parts.append(f"{name}短中期均線大致呈多頭排列（一致度約{ma_ratio:.0%}，未達完全標準排列），技術面轉多但訊號強度較弱，信心較低。")
         if pv_health == "healthy_up":
             parts.append("股價上漲的同時成交量同步放大，屬於價量配合的健康上攻型態。")
         elif pv_health == "weak_up":
@@ -112,7 +116,10 @@ def _narrate(
         if margin_change > 3000:
             parts.append(f"融資餘額短期增加約{margin_change:.0f}張，若股價拉回，這批融資部位可能形成賣壓，已在評分中扣分反映。")
     else:  # short
-        parts.append(f"{name}目前跌破短中期均線且呈空頭排列，技術面偏空。")
+        if ma_ratio >= 0.99:
+            parts.append(f"{name}目前跌破短中期均線且呈空頭排列，技術面偏空。")
+        else:
+            parts.append(f"{name}短中期均線大致呈空頭排列（一致度約{ma_ratio:.0%}，未達完全標準排列），技術面轉空但訊號強度較弱，信心較低。")
         if pv_health == "healthy_down":
             parts.append("股價下跌的同時成交量同步放大，屬於賣壓確實出籠的趨勢確認型態。")
         elif pv_health == "weak_down":
@@ -137,7 +144,7 @@ def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Can
     close_hist = row["close_hist"]
     volume_hist = row["volume_hist"]
 
-    ma_state = ma_alignment(close_hist, SCORING.ma_windows[:3])
+    ma_state, ma_ratio = ma_alignment_ratio(close_hist, SCORING.ma_windows[:3])
     vol_exp = volume_expansion_ratio(volume_hist)
     pv_health = price_volume_health(close_hist, volume_hist)
 
@@ -166,8 +173,12 @@ def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Can
     if direction == "long":
         if ma_state != "bullish":
             return None  # 不符合多方型態，不強行評分
-        score += 40
-        reasons.append("均線多頭排列")
+        if ma_ratio >= 0.99:
+            score += 40
+            reasons.append("均線多頭排列")
+        else:
+            score += 20
+            reasons.append(f"均線大致偏多(一致度{ma_ratio:.0%})，未達完全標準排列，信心較低")
         if pv_health == "healthy_up":
             score += 20
             reasons.append("價漲量增(健康)")
@@ -186,8 +197,12 @@ def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Can
     else:  # short
         if ma_state != "bearish":
             return None
-        score += 40
-        reasons.append("均線空頭排列")
+        if ma_ratio >= 0.99:
+            score += 40
+            reasons.append("均線空頭排列")
+        else:
+            score += 20
+            reasons.append(f"均線大致偏空(一致度{ma_ratio:.0%})，未達完全標準排列，信心較低")
         if pv_health == "healthy_down":
             score += 20
             reasons.append("價跌量增(趨勢確認)")
@@ -210,6 +225,7 @@ def _score_stock(stock_id: str, snapshot: MarketSnapshot, direction: str) -> Can
         name=name,
         direction=direction,
         ma_state=ma_state,
+        ma_ratio=ma_ratio,
         pv_health=pv_health,
         vol_exp=vol_exp,
         inst_net=inst_net,
