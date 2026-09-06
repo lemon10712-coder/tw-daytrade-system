@@ -1,0 +1,65 @@
+[
+  {
+    "stock_id": "6620",
+    "name": "漢達",
+    "direction": "long",
+    "prev_close": 98.0,
+    "entry_reference": 104.03333333333335,
+    "stop_price": 102.99619047619049,
+    "target_price": 106.10761904761905
+  },
+  {
+    "stock_id": "6491",
+    "name": "晶碩",
+    "direction": "long",
+    "prev_close": 380.5,
+    "entry_reference": 383.5,
+    "stop_price": 375.9142857142857,
+    "target_price": 398.6714285714286
+  },
+  {
+    "stock_id": "4771",
+    "name": "望隼",
+    "direction": "long",
+    "prev_close": 209.5,
+    "entry_reference": 209.33333333333334,
+    "stop_price": 206.03333333333333,
+    "target_price": 215.93333333333337
+  },
+  {
+    "stock_id": "8464",
+    "name": "億豐",
+    "direction": "long",
+    "prev_close": 367.5,
+    "entry_reference": 371.3333333333333,
+    "stop_price": 366.06190476190477,
+    "target_price": 381.8761904761904
+  },
+  {
+    "stock_id": "8096",
+    "name": "擎亞",
+    "direction": "short",
+    "prev_close": 104.0,
+    "entry_reference": 104.66666666666667,
+    "stop_price": 105.18095238095239,
+    "target_price": 103.63809523809523
+  },
+  {
+    "stock_id": "3036",
+    "name": "文曄",
+    "direction": "short",
+    "prev_close": 190.5,
+    "entry_reference": 192.0,
+    "stop_price": 195.04285714285714,
+    "target_price": 185.9142857142857
+  },
+  {
+    "stock_id": "6227",
+    "name": "茂綸",
+    "direction": "short",
+    "prev_close": 113.0,
+    "entry_reference": 114.0,
+    "stop_price": 114.3,
+    "target_price": 113.4
+  }
+]
