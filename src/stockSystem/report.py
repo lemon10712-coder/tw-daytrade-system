@@ -82,6 +82,8 @@ def render_daily_report(
     issues: list,
     long_entry_exit: dict | None = None,   # {stock_id: EntryExitPlan}
     short_entry_exit: dict | None = None,
+    backtest_review: list | None = None,   # [backtest_tracker.BacktestOutcome, ...]，上一交易日候選股的真實結果
+    backtest_summary: dict | None = None,  # backtest_tracker.append_summary() 回傳的累積統計
 ) -> str:
     lines = []
     is_test = snapshot.is_synthetic()
@@ -97,11 +99,41 @@ def render_daily_report(
             lines.append(f"- {issue}")
         lines.append("")
 
-    lines.append("## 1. 國際情勢摘要")
+    lines.append("## 1. 回測：上一交易日候選股表現")
+    if not backtest_review:
+        lines.append("（尚無上一交易日的候選股記錄可供比對，通常是系統剛啟用的第一天，或上一個交易日沒有任何候選股）")
+        lines.append("")
+    else:
+        lines.append(
+            "> ＊比對方式：用上一個交易日收盤後正式公布的真實開高低收，回頭檢查當時報告裡的進場/止損/停利"
+            "參考價有沒有被觸及。只有日成交高低價，無法判斷同一天內止損/停利的真實先後順序，這種情況會"
+            "老實標成「無法判斷」，不會用猜的。"
+        )
+        lines.append("")
+        for o in backtest_review:
+            direction_label = "多方" if o.direction == "long" else "空方"
+            touched_label = "✅ 有觸及" if o.entry_touched else "❌ 未觸及"
+            lines.append(f"- {o.stock_id}　{o.name}（{direction_label}）：進場參考 {o.entry_reference:.2f}，"
+                          f"{touched_label}（實際開{o.actual_open:.2f}／高{o.actual_high:.2f}／"
+                          f"低{o.actual_low:.2f}／收{o.actual_close:.2f}）——{o.result}")
+        lines.append("")
+        if backtest_summary and backtest_summary.get("cumulative", {}).get("sample_trading_days"):
+            cum = backtest_summary["cumulative"]
+            touch_rate = cum.get("entry_touch_rate")
+            touch_rate_str = f"{touch_rate:.0%}" if touch_rate is not None else "無資料"
+            lines.append(
+                f"累積統計（共 {cum['sample_trading_days']} 個交易日、{cum['total_candidates']} 檔候選股樣本，"
+                f"樣本數尚少，僅供參考，不是正式回測驗證結論）：進場觸價率 {touch_rate_str}，"
+                f"觸及後止損 {cum['hit_stop_only']} 次、觸及後停利 {cum['hit_target_only']} 次、"
+                f"同日雙邊觸及無法判斷 {cum['both_same_day']} 次、觸及後收盤前尚未觸及止損停利 {cum['neither']} 次。"
+            )
+            lines.append("")
+
+    lines.append("## 2. 國際情勢摘要")
     lines.append(format_intl_summary(snapshot.intl_snapshot))
     lines.append("")
 
-    lines.append("## 2. 族群強度排行榜")
+    lines.append("## 3. 族群強度排行榜")
     lines.append("### 最強族群")
     for s in strongest_sectors[:5]:
         lines.append(
@@ -116,10 +148,10 @@ def render_daily_report(
         )
     lines.append("")
 
-    def render_candidates(title: str, candidates: list, entry_exit_map: dict, empty_note: str | None = None) -> None:
+    def render_candidates(title: str, candidates: list, entry_exit_map: dict) -> None:
         lines.append(f"## {title}")
         if not candidates:
-            lines.append(empty_note or "（今日無符合條件的候選股）")
+            lines.append("（今日無符合條件的候選股）")
             lines.append("")
             return
         # 進出場的資料限制警語（日線近似VWAP、無法用日資料算開盤區間等）每一檔都完全一樣，
@@ -157,15 +189,10 @@ def render_daily_report(
                 lines.append(f"- 停利參考: {ee.target_price:.2f}（{ee.target_basis}）")
             lines.append("")
 
-    render_candidates("3. 多方候選清單", long_candidates, long_entry_exit or {})
-    render_candidates(
-        "4. 空方候選清單",
-        short_candidates,
-        short_entry_exit or {},
-        empty_note="（依使用者指示，本次分析不篩選放空(空方)候選——只針對最強族群做多方篩選，2026-09-04 起停用最弱族群的空方篩選）",
-    )
+    render_candidates("4. 多方候選清單", long_candidates, long_entry_exit or {})
+    render_candidates("5. 空方候選清單", short_candidates, short_entry_exit or {})
 
-    lines.append("## 5. 資金配置建議組合")
+    lines.append("## 6. 資金配置建議組合")
     if not combos:
         lines.append("（無可行組合，可能是候選股皆超出你的額度或無合格候選股）")
     all_ee = {**(long_entry_exit or {}), **(short_entry_exit or {})}
@@ -182,7 +209,7 @@ def render_daily_report(
             )
     lines.append("")
 
-    lines.append("## 6. 名詞小教室")
+    lines.append("## 7. 名詞小教室")
     lines.append("見專案文件《台股當沖選股系統_規劃書》附錄名詞小辭典。")
 
     return "\n".join(lines)
