@@ -1,5 +1,6 @@
 import datetime as dt
 
+from stockSystem import backtest_tracker as bt
 from stockSystem.backtest import GateResult
 from stockSystem.data_sources import FixtureProvider
 from stockSystem.entry_exit import compute_entry_exit
@@ -99,6 +100,64 @@ def test_report_includes_entry_stop_target_and_caveat_when_provided():
         assert "止損參考" in report
         assert "停利參考" in report
         assert "VWAP" in report and "近似" in report
+
+
+def test_report_includes_backtest_review_section_when_provided():
+    """呼應使用者要求：「請妳回測」、「以後都要自動回測」——上一交易日候選股的真實觸價結果
+    要出現在報告裡，不用使用者自己每次人工查一次。"""
+    snapshot = FixtureProvider(seed=1).get_snapshot(dt.date.today())
+    scores = compute_sector_scores(snapshot.ohlcv, {3: 0.0, 5: 0.0, 10: 0.0})
+    strongest, weakest = rank_sectors(scores)
+    long_c, _ = screen_sector(snapshot, strongest[0].sector, "long")
+
+    outcome = bt.evaluate_outcome(
+        {"stock_id": "1303", "name": "南亞", "direction": "long",
+         "entry_reference": 239.17, "stop_price": 228.28, "target_price": 260.94},
+        actual_open=243.0, actual_high=244.5, actual_low=219.5, actual_close=221.0,
+    )
+
+    report = render_daily_report(
+        as_of=dt.date.today(),
+        snapshot=snapshot,
+        strongest_sectors=strongest,
+        weakest_sectors=weakest,
+        long_candidates=long_c,
+        short_candidates=[],
+        gate_results={},
+        combos=build_all_combos(long_c),
+        issues=self_check(snapshot),
+        backtest_review=[outcome],
+        backtest_summary={"cumulative": {
+            "sample_trading_days": 1, "total_candidates": 1, "entry_touched": 1,
+            "entry_touch_rate": 1.0, "hit_stop_only": 1, "hit_target_only": 0,
+            "both_same_day": 0, "neither": 0,
+        }},
+    )
+    assert "回測：上一交易日候選股表現" in report
+    assert "南亞" in report and "有觸及" in report
+    assert "止損參考價" in report
+    assert "累積統計" in report
+
+
+def test_report_backtest_section_has_honest_placeholder_when_no_review_available():
+    snapshot = FixtureProvider(seed=1).get_snapshot(dt.date.today())
+    scores = compute_sector_scores(snapshot.ohlcv, {3: 0.0, 5: 0.0, 10: 0.0})
+    strongest, weakest = rank_sectors(scores)
+    long_c, _ = screen_sector(snapshot, strongest[0].sector, "long")
+
+    report = render_daily_report(
+        as_of=dt.date.today(),
+        snapshot=snapshot,
+        strongest_sectors=strongest,
+        weakest_sectors=weakest,
+        long_candidates=long_c,
+        short_candidates=[],
+        gate_results={},
+        combos=build_all_combos(long_c),
+        issues=self_check(snapshot),
+    )
+    assert "回測：上一交易日候選股表現" in report
+    assert "尚無上一交易日的候選股記錄" in report
 
 
 def test_behavior_checklist_triggers_overconfidence_reminder():
