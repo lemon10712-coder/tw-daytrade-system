@@ -25,12 +25,19 @@ from zoneinfo import ZoneInfo
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
+from stockSystem import backtest_tracker as bt  # noqa: E402
 from stockSystem.backtest import GateResult  # noqa: E402
 from stockSystem.data_sources import DataSourceUnavailableError, DataValidationError  # noqa: E402
 from stockSystem.entry_exit import compute_entry_exit  # noqa: E402
 from stockSystem.logging_setup import get_logger, new_run_id  # noqa: E402
 from stockSystem.position_sizing import build_all_combos  # noqa: E402
-from stockSystem.real_providers import RealTwseProvider, RealYFinanceIntlProvider  # noqa: E402
+from stockSystem.real_providers import (  # noqa: E402
+    RealTwseProvider,
+    RealYFinanceIntlProvider,
+    _fetch_tpex_day_all,
+    _fetch_twse_day_all,
+    _parse_market_rows,
+)
 from stockSystem.report import render_daily_report, self_check  # noqa: E402
 from stockSystem.sector_strength import apply_macro_overlay, compute_sector_scores, rank_sectors  # noqa: E402
 from stockSystem.stock_screener import screen_sector  # noqa: E402
@@ -38,6 +45,58 @@ from stockSystem.stock_screener import screen_sector  # noqa: E402
 DATA_DIR = REPO_ROOT / "data"
 REPORTS_DIR = REPO_ROOT / "reports"
 TAIPEI = ZoneInfo("Asia/Taipei")
+
+
+def _run_backtest_review(as_of: dt.date, data_dir: Path, log) -> tuple[list, dict | None]:
+    """自動回測：讀回「上一個有記錄候選股的交易日」，用當時已經正式公布的真實開高低收，
+    檢查那天報告裡的進場/止損/停利參考價有沒有被觸及。任何一步失敗都不能讓整次報告掛掉——
+    這是錦上添花的區塊，不是核心資料，失敗就記警告、回傳空結果，報告照樣產生
+    （呼應 `fetch_daily_snapshot_dict` 對「核心 vs 非核心」失敗處理的一貫原則）。
+    """
+    try:
+        prev_date = bt.find_last_recorded_date(data_dir, as_of)
+        if prev_date is None:
+            log.info("回測比對：找不到 %s 之前的候選股記錄（可能是系統剛啟用），本次報告不含回測區塊", as_of)
+            return [], None
+
+        records = bt.load_candidates(data_dir, prev_date)
+        if not records:
+            return [], None
+
+        import requests
+
+        session = requests.Session()
+        try:
+            twse_raw = _fetch_twse_day_all(session, prev_date)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("回測比對：抓不到 %s 的 TWSE 正式收盤資料，略過回測區塊: %r", prev_date, exc)
+            twse_raw = []
+        try:
+            tpex_raw = _fetch_tpex_day_all(session, prev_date)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("回測比對：抓不到 %s 的 TPEx 正式收盤資料: %r", prev_date, exc)
+            tpex_raw = []
+
+        actual_rows = _parse_market_rows(twse_raw, "TWSE")
+        actual_rows.update(_parse_market_rows(tpex_raw, "TPEx"))
+
+        outcomes = []
+        for record in records:
+            actual = actual_rows.get(record["stock_id"])
+            if actual is None:
+                log.warning("回測比對：%s 當天(%s)的真實收盤資料裡找不到 %s，略過這一檔",
+                            record["stock_id"], prev_date, record["stock_id"])
+                continue
+            outcomes.append(bt.evaluate_outcome(
+                record, actual["open"], actual["high"], actual["low"], actual["close"]
+            ))
+
+        summary = bt.append_summary(data_dir, prev_date, outcomes) if outcomes else None
+        log.info("回測比對完成：%s 的候選股共 %d 檔，比對到真實結果 %d 檔", prev_date, len(records), len(outcomes))
+        return outcomes, summary
+    except Exception as exc:  # noqa: BLE001
+        log.warning("自動回測比對整體失敗，本次報告不含回測區塊（不影響報告其他部分）: %r", exc)
+        return [], None
 
 
 def _entry_exit_for(snapshot, candidates):
@@ -109,15 +168,15 @@ def main() -> int:
     log.info("族群強度排名完成，最強=%s，最弱=%s", strongest[0].sector, weakest[0].sector)
 
     long_candidates = []
-    # 2026-09-04 使用者明確要求：只篩選最強族群的多方候選，最弱族群的放空(空方)篩選先不用——
-    # 不是「篩不出來」，是刻意不篩，所以這裡固定給空清單，不呼叫 screen_sector(..., "short")。
-    # 之後如果使用者想恢復空方篩選，把下面這段迴圈（仿照多方那段，改成 weakest[:3] / "short"）
-    # 加回來即可，不需要動 stock_screener.py 或 report.py 的邏輯。
-    short_candidates: list = []
+    short_candidates = []
     for s in strongest[:3]:
         cands, excluded = screen_sector(snapshot, s.sector, "long")
         log.info("多方篩選 %s：候選 %d 檔，排除 %d 檔", s.sector, len(cands), len(excluded))
         long_candidates.extend(cands[:3])
+    for s in weakest[:3]:
+        cands, excluded = screen_sector(snapshot, s.sector, "short")
+        log.info("空方篩選 %s：候選 %d 檔，排除 %d 檔", s.sector, len(cands), len(excluded))
+        short_candidates.extend(cands[:3])
 
     # 回測晉升門檻的真正串接（用 state/rule_registry.json 的歷史紀錄）留待累積夠多真實交易日資料後再接，
     # 目前累積的歷史天數如果還不夠 backtest.py 的 min_sample_size，一律誠實標示 unvalidated，
@@ -133,6 +192,12 @@ def main() -> int:
     long_ee = _entry_exit_for(snapshot, long_candidates)
     short_ee = _entry_exit_for(snapshot, short_candidates)
 
+    # 自動回測（2026-09-03 使用者要求：「請妳回測」「以後都要自動回測」）：先比對上一個交易日
+    # 的候選股有沒有真的觸價，再把「今天」的候選股存下來給明天用——順序不能顛倒，不然今天會
+    # 拿自己比對自己。
+    backtest_review, backtest_summary = _run_backtest_review(as_of, DATA_DIR, log)
+    bt.save_candidates(DATA_DIR, as_of, long_candidates + short_candidates, {**long_ee, **short_ee})
+
     issues = self_check(snapshot) + endpoint_issues
     report_md = render_daily_report(
         as_of=as_of,
@@ -146,6 +211,8 @@ def main() -> int:
         issues=issues,
         long_entry_exit=long_ee,
         short_entry_exit=short_ee,
+        backtest_review=backtest_review,
+        backtest_summary=backtest_summary,
     )
 
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
