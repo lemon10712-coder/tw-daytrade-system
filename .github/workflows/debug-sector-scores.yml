@@ -1,0 +1,38 @@
+name: 診斷：族群強度完整排名（一次性/手動）
+
+# 一次性診斷用：印出當天完整的族群強度排名（不只報告顯示的前5強/前5弱），
+# 並列出量能擴張比異常大的個股明細，用來追查「使用者覺得應該很強的族群
+# （例如記憶體/半導體、光通訊相關）為什麼沒被選進最強族群」這種問題。
+# 純讀取、不寫入 data/，不會影響正式的每日報告資料。
+on:
+  workflow_dispatch:
+    inputs:
+      report_date:
+        description: "要診斷的資料日期（YYYY-MM-DD），留空就用今天"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pandas numpy
+
+      - name: 印出完整族群強度排名與量能異常個股
+        env:
+          REPORT_DATE: ${{ github.event.inputs.report_date }}
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          python scripts/debug_sector_scores.py
