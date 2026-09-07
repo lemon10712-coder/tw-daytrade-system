@@ -67,7 +67,12 @@ def compute_sector_scores(
             volume_expansion_ratio(v) for v in rows["volume_hist"] if len(v) >= 20
         ]
         vol_ratios = [v for v in vol_ratios if not np.isnan(v)]
-        vol_expansion = float(np.mean(vol_ratios)) if vol_ratios else float("nan")
+        # 2026-09-07 修正：改用中位數而不是平均數。族群動輒有幾十到上百檔股票，
+        # 只要其中一檔的量能擴張比異常大，平均數會被單一極端值拖走，讓「一檔股票暴量」
+        # 被誤判成「整個族群放量」；中位數對這種單點離群值有抵抗力，更能反映族群
+        # 「大部分股票」的真實量能狀態（見 KNOWN_ISSUES.md 2026-09-07 診斷紀錄，
+        # 生技醫療業原本平均數 26.40 倍幾乎全部來自單一檔 6649 台生材的異常比率）。
+        vol_expansion = float(np.median(vol_ratios)) if vol_ratios else float("nan")
 
         composite = (
             (rs if not np.isnan(rs) else 0) * 100
