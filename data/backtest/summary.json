@@ -1,0 +1,22 @@
+{
+  "by_date": {
+    "2026-09-07": {
+      "total_candidates": 7,
+      "entry_touched": 5,
+      "hit_stop_only": 2,
+      "hit_target_only": 0,
+      "both_same_day": 1,
+      "neither": 2
+    }
+  },
+  "cumulative": {
+    "total_candidates": 7,
+    "entry_touched": 5,
+    "hit_stop_only": 2,
+    "hit_target_only": 0,
+    "both_same_day": 1,
+    "neither": 2,
+    "entry_touch_rate": 0.7143,
+    "sample_trading_days": 1
+  }
+}

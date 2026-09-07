@@ -1,0 +1,47 @@
+[
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 115.0,
+    "entry_reference": 114.16666666666667,
+    "stop_price": 111.92952380952381,
+    "target_price": 118.64095238095238
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 150.5,
+    "entry_reference": 149.66666666666666,
+    "stop_price": 146.58095238095237,
+    "target_price": 155.83809523809524
+  },
+  {
+    "stock_id": "8096",
+    "name": "擎亞",
+    "direction": "short",
+    "prev_close": 104.5,
+    "entry_reference": 105.83333333333333,
+    "stop_price": 106.39047619047619,
+    "target_price": 104.7190476190476
+  },
+  {
+    "stock_id": "3036",
+    "name": "文曄",
+    "direction": "short",
+    "prev_close": 192.5,
+    "entry_reference": 192.0,
+    "stop_price": 195.0,
+    "target_price": 186.0
+  },
+  {
+    "stock_id": "6227",
+    "name": "茂綸",
+    "direction": "short",
+    "prev_close": 113.5,
+    "entry_reference": 112.5,
+    "stop_price": 112.97142857142858,
+    "target_price": 111.55714285714285
+  }
+]
