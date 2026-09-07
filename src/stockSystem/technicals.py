@@ -33,6 +33,35 @@ def ma_alignment(close_hist: np.ndarray, windows=(5, 10, 20)) -> str:
     return "mixed"
 
 
+def ma_alignment_ratio(close_hist: np.ndarray, windows=(5, 10, 20)) -> tuple[str, float]:
+    """比 ma_alignment() 更寬鬆的連續版本：回傳 (方向, 一致度 0~1)。
+
+    2026-09-04 使用者明確要求：均線排列的判定不要再用「教科書等級完美排列才算」的二選一，
+    要允許「大致偏多/大致偏空」也能進候選清單（信心較低即可，不是完全不給）。
+
+    一致度是「price>MA5、price>MA10、price>MA20、MA5>MA10、MA10>MA20」這5個多頭條件裡
+    符合幾個(除以5)；空頭方向是對應的5個反向條件。ma_alignment() 的嚴格「bullish」
+    等同於這裡一致度剛好等於1.0的情況（5個條件全部成立），所以呼叫端只要看一致度
+    是否達到1.0，就能重現原本二選一的行為，不會改變既有測試的預期。
+
+    一致度未達0.6（5個條件符合不到3個）的一律回傳 'mixed'、一致度0.0，避免用不到一半的
+    雜訊訊號硬凹出方向；兩個方向都可能符合時，取比例較高的那一個。
+    """
+    mas = [moving_average(close_hist, w) for w in windows]
+    if any(np.isnan(mas)):
+        return "insufficient_data", 0.0
+    price = close_hist[-1]
+    bull_checks = [price > mas[0], price > mas[1], price > mas[2], mas[0] > mas[1], mas[1] > mas[2]]
+    bear_checks = [price < mas[0], price < mas[1], price < mas[2], mas[0] < mas[1], mas[1] < mas[2]]
+    bull_ratio = sum(bull_checks) / len(bull_checks)
+    bear_ratio = sum(bear_checks) / len(bear_checks)
+    if bull_ratio >= 0.6 and bull_ratio >= bear_ratio:
+        return "bullish", bull_ratio
+    if bear_ratio >= 0.6 and bear_ratio > bull_ratio:
+        return "bearish", bear_ratio
+    return "mixed", 0.0
+
+
 def true_range(high: float, low: float, prev_close: float) -> float:
     return max(high - low, abs(high - prev_close), abs(low - prev_close))
 
