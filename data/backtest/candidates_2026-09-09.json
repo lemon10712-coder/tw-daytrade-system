@@ -1,0 +1,47 @@
+[
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 115.0,
+    "entry_reference": 113.83333333333333,
+    "stop_price": 111.51904761904761,
+    "target_price": 118.46190476190476
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 150.5,
+    "entry_reference": 149.16666666666666,
+    "stop_price": 145.99523809523808,
+    "target_price": 155.5095238095238
+  },
+  {
+    "stock_id": "6538",
+    "name": "倉和",
+    "direction": "long",
+    "prev_close": 305.0,
+    "entry_reference": 316.0,
+    "stop_price": 309.7857142857143,
+    "target_price": 328.42857142857144
+  },
+  {
+    "stock_id": "6207",
+    "name": "雷科",
+    "direction": "long",
+    "prev_close": 112.5,
+    "entry_reference": 117.5,
+    "stop_price": 115.87142857142857,
+    "target_price": 120.75714285714287
+  },
+  {
+    "stock_id": "8042",
+    "name": "金山電",
+    "direction": "long",
+    "prev_close": 121.5,
+    "entry_reference": 115.5,
+    "stop_price": 112.07142857142857,
+    "target_price": 122.35714285714286
+  }
+]
