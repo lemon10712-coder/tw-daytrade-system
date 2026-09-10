@@ -1,0 +1,20 @@
+[
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 113.5,
+    "entry_reference": 110.83333333333333,
+    "stop_price": 108.50190476190475,
+    "target_price": 115.49619047619048
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 149.0,
+    "entry_reference": 147.0,
+    "stop_price": 144.17142857142858,
+    "target_price": 152.65714285714284
+  }
+]
