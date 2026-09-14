@@ -1,0 +1,65 @@
+[
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 113.0,
+    "entry_reference": 116.0,
+    "stop_price": 114.54285714285714,
+    "target_price": 118.91428571428571
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 187.5,
+    "entry_reference": 188.66666666666666,
+    "stop_price": 187.46666666666667,
+    "target_price": 191.06666666666663
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 110.5,
+    "entry_reference": 109.83333333333333,
+    "stop_price": 107.99047619047619,
+    "target_price": 113.51904761904761
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 148.5,
+    "entry_reference": 147.0,
+    "stop_price": 145.02857142857144,
+    "target_price": 150.94285714285712
+  },
+  {
+    "stock_id": "6890",
+    "name": "來億-KY",
+    "direction": "short",
+    "prev_close": 154.0,
+    "entry_reference": 149.66666666666666,
+    "stop_price": 153.8238095238095,
+    "target_price": 141.35238095238097
+  },
+  {
+    "stock_id": "2731",
+    "name": "雄獅",
+    "direction": "short",
+    "prev_close": 141.5,
+    "entry_reference": 141.5,
+    "stop_price": 142.14285714285714,
+    "target_price": 140.21428571428572
+  },
+  {
+    "stock_id": "2727",
+    "name": "王品",
+    "direction": "short",
+    "prev_close": 229.5,
+    "entry_reference": 229.16666666666666,
+    "stop_price": 230.7095238095238,
+    "target_price": 226.08095238095237
+  }
+]
