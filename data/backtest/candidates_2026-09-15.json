@@ -1,0 +1,83 @@
+[
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 116.5,
+    "entry_reference": 119.16666666666667,
+    "stop_price": 117.75238095238096,
+    "target_price": 121.9952380952381
+  },
+  {
+    "stock_id": "3147",
+    "name": "大綜",
+    "direction": "long",
+    "prev_close": 223.5,
+    "entry_reference": 226.83333333333334,
+    "stop_price": 223.96190476190478,
+    "target_price": 232.57619047619048
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 188.5,
+    "entry_reference": 187.33333333333334,
+    "stop_price": 186.0904761904762,
+    "target_price": 189.8190476190476
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 148.5,
+    "entry_reference": 151.5,
+    "stop_price": 149.31428571428572,
+    "target_price": 155.87142857142857
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 110.5,
+    "entry_reference": 111.66666666666667,
+    "stop_price": 109.6952380952381,
+    "target_price": 115.60952380952382
+  },
+  {
+    "stock_id": "8464",
+    "name": "億豐",
+    "direction": "long",
+    "prev_close": 371.0,
+    "entry_reference": 378.1666666666667,
+    "stop_price": 374.052380952381,
+    "target_price": 386.3952380952381
+  },
+  {
+    "stock_id": "3430",
+    "name": "奇鈦科",
+    "direction": "short",
+    "prev_close": 103.5,
+    "entry_reference": 100.96666666666665,
+    "stop_price": 102.89523809523808,
+    "target_price": 97.1095238095238
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "short",
+    "prev_close": 184.0,
+    "entry_reference": 186.33333333333334,
+    "stop_price": 190.44761904761907,
+    "target_price": 178.1047619047619
+  },
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "short",
+    "prev_close": 242.0,
+    "entry_reference": 235.5,
+    "stop_price": 237.6,
+    "target_price": 231.3
+  }
+]
