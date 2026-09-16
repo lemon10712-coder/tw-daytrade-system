@@ -1,0 +1,110 @@
+[
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 116.5,
+    "entry_reference": 118.16666666666667,
+    "stop_price": 116.75238095238096,
+    "target_price": 120.9952380952381
+  },
+  {
+    "stock_id": "3147",
+    "name": "大綜",
+    "direction": "long",
+    "prev_close": 226.0,
+    "entry_reference": 228.5,
+    "stop_price": 225.54285714285714,
+    "target_price": 234.4142857142857
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 187.5,
+    "entry_reference": 190.33333333333334,
+    "stop_price": 189.00476190476192,
+    "target_price": 192.9904761904762
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 154.0,
+    "entry_reference": 151.66666666666666,
+    "stop_price": 149.48095238095237,
+    "target_price": 156.03809523809522
+  },
+  {
+    "stock_id": "7714",
+    "name": "創泓科技",
+    "direction": "long",
+    "prev_close": 183.0,
+    "entry_reference": 182.0,
+    "stop_price": 177.62857142857143,
+    "target_price": 190.74285714285713
+  },
+  {
+    "stock_id": "6870",
+    "name": "騰雲",
+    "direction": "long",
+    "prev_close": 304.5,
+    "entry_reference": 323.1666666666667,
+    "stop_price": 316.73809523809524,
+    "target_price": 336.0238095238096
+  },
+  {
+    "stock_id": "3264",
+    "name": "欣銓",
+    "direction": "short",
+    "prev_close": 227.5,
+    "entry_reference": 223.33333333333334,
+    "stop_price": 227.14761904761906,
+    "target_price": 215.7047619047619
+  },
+  {
+    "stock_id": "3661",
+    "name": "世芯-KY",
+    "direction": "short",
+    "prev_close": 3590.0,
+    "entry_reference": 3426.6666666666665,
+    "stop_price": 3595.095238095238,
+    "target_price": 3089.8095238095234
+  },
+  {
+    "stock_id": "3260",
+    "name": "威剛",
+    "direction": "short",
+    "prev_close": 398.0,
+    "entry_reference": 389.5,
+    "stop_price": 394.9,
+    "target_price": 378.70000000000005
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "short",
+    "prev_close": 190.0,
+    "entry_reference": 187.5,
+    "stop_price": 191.87142857142857,
+    "target_price": 178.75714285714287
+  },
+  {
+    "stock_id": "4770",
+    "name": "上品",
+    "direction": "short",
+    "prev_close": 224.5,
+    "entry_reference": 221.83333333333334,
+    "stop_price": 228.86190476190478,
+    "target_price": 207.77619047619046
+  },
+  {
+    "stock_id": "3430",
+    "name": "奇鈦科",
+    "direction": "short",
+    "prev_close": 100.5,
+    "entry_reference": 102.16666666666667,
+    "stop_price": 104.13809523809525,
+    "target_price": 98.22380952380952
+  }
+]
