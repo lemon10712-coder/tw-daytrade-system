@@ -1,0 +1,56 @@
+[
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 191.0,
+    "entry_reference": 192.0,
+    "stop_price": 190.75714285714287,
+    "target_price": 194.48571428571427
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 119.5,
+    "entry_reference": 116.83333333333333,
+    "stop_price": 115.2047619047619,
+    "target_price": 120.0904761904762
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 153.0,
+    "entry_reference": 152.33333333333334,
+    "stop_price": 150.06190476190477,
+    "target_price": 156.8761904761905
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 112.5,
+    "entry_reference": 112.33333333333333,
+    "stop_price": 110.57619047619048,
+    "target_price": 115.84761904761903
+  },
+  {
+    "stock_id": "6706",
+    "name": "惠特",
+    "direction": "long",
+    "prev_close": 147.0,
+    "entry_reference": 148.5,
+    "stop_price": 143.18571428571428,
+    "target_price": 159.12857142857143
+  },
+  {
+    "stock_id": "2466",
+    "name": "冠西電",
+    "direction": "long",
+    "prev_close": 104.0,
+    "entry_reference": 103.66666666666667,
+    "stop_price": 100.48666666666668,
+    "target_price": 110.02666666666666
+  }
+]
