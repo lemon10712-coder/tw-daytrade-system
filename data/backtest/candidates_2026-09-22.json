@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "3675",
+    "name": "德微",
+    "direction": "long",
+    "prev_close": 294.0,
+    "entry_reference": 295.0,
+    "stop_price": 288.1,
+    "target_price": 308.79999999999995
+  },
+  {
+    "stock_id": "7772",
+    "name": "耀穎",
+    "direction": "long",
+    "prev_close": 155.5,
+    "entry_reference": 163.0,
+    "stop_price": 154.72857142857143,
+    "target_price": 179.54285714285714
+  },
+  {
+    "stock_id": "8227",
+    "name": "巨有科技",
+    "direction": "long",
+    "prev_close": 279.0,
+    "entry_reference": 282.1666666666667,
+    "stop_price": 270.59523809523813,
+    "target_price": 305.3095238095238
+  },
+  {
+    "stock_id": "7717",
+    "name": "萊德光電-KY",
+    "direction": "long",
+    "prev_close": 600.0,
+    "entry_reference": 593.0,
+    "stop_price": 564.8,
+    "target_price": 649.4000000000001
+  },
+  {
+    "stock_id": "2412",
+    "name": "中華電",
+    "direction": "long",
+    "prev_close": 145.5,
+    "entry_reference": 144.16666666666666,
+    "stop_price": 143.3095238095238,
+    "target_price": 145.88095238095238
+  },
+  {
+    "stock_id": "3045",
+    "name": "台灣大",
+    "direction": "long",
+    "prev_close": 124.0,
+    "entry_reference": 124.0,
+    "stop_price": 123.18571428571428,
+    "target_price": 125.62857142857143
+  },
+  {
+    "stock_id": "3147",
+    "name": "大綜",
+    "direction": "long",
+    "prev_close": 242.5,
+    "entry_reference": 239.66666666666666,
+    "stop_price": 234.99523809523808,
+    "target_price": 249.0095238095238
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 125.0,
+    "entry_reference": 122.16666666666667,
+    "stop_price": 119.46666666666667,
+    "target_price": 127.56666666666668
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 165.0,
+    "entry_reference": 164.83333333333334,
+    "stop_price": 163.63333333333335,
+    "target_price": 167.23333333333332
+  },
+  {
+    "stock_id": "8464",
+    "name": "億豐",
+    "direction": "short",
+    "prev_close": 370.0,
+    "entry_reference": 370.8333333333333,
+    "stop_price": 374.99047619047616,
+    "target_price": 362.5190476190476
+  }
+]
