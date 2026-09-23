@@ -1,0 +1,110 @@
+[
+  {
+    "stock_id": "2449",
+    "name": "京元電子",
+    "direction": "long",
+    "prev_close": 301.5,
+    "entry_reference": 319.6666666666667,
+    "stop_price": 311.56666666666666,
+    "target_price": 335.86666666666673
+  },
+  {
+    "stock_id": "8150",
+    "name": "南茂",
+    "direction": "long",
+    "prev_close": 103.0,
+    "entry_reference": 105.16666666666667,
+    "stop_price": 102.3809523809524,
+    "target_price": 110.73809523809523
+  },
+  {
+    "stock_id": "2303",
+    "name": "聯電",
+    "direction": "long",
+    "prev_close": 157.0,
+    "entry_reference": 162.83333333333334,
+    "stop_price": 158.71904761904761,
+    "target_price": 171.0619047619048
+  },
+  {
+    "stock_id": "2412",
+    "name": "中華電",
+    "direction": "long",
+    "prev_close": 144.5,
+    "entry_reference": 144.33333333333334,
+    "stop_price": 143.43333333333334,
+    "target_price": 146.13333333333335
+  },
+  {
+    "stock_id": "2455",
+    "name": "全新",
+    "direction": "long",
+    "prev_close": 572.0,
+    "entry_reference": 551.3333333333334,
+    "stop_price": 534.9619047619047,
+    "target_price": 584.0761904761906
+  },
+  {
+    "stock_id": "3138",
+    "name": "耀登",
+    "direction": "long",
+    "prev_close": 102.5,
+    "entry_reference": 101.53333333333335,
+    "stop_price": 97.51333333333335,
+    "target_price": 109.57333333333334
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 164.5,
+    "entry_reference": 162.66666666666666,
+    "stop_price": 161.2952380952381,
+    "target_price": 165.4095238095238
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 121.0,
+    "entry_reference": 122.0,
+    "stop_price": 119.3,
+    "target_price": 127.4
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 191.5,
+    "entry_reference": 190.66666666666666,
+    "stop_price": 189.08095238095237,
+    "target_price": 193.83809523809524
+  },
+  {
+    "stock_id": "1736",
+    "name": "喬山",
+    "direction": "short",
+    "prev_close": 123.0,
+    "entry_reference": 124.0,
+    "stop_price": 126.61428571428571,
+    "target_price": 118.77142857142857
+  },
+  {
+    "stock_id": "6670",
+    "name": "復盛應用",
+    "direction": "short",
+    "prev_close": 272.5,
+    "entry_reference": 271.1666666666667,
+    "stop_price": 273.5238095238095,
+    "target_price": 266.452380952381
+  },
+  {
+    "stock_id": "6890",
+    "name": "來億-KY",
+    "direction": "short",
+    "prev_close": 146.0,
+    "entry_reference": 148.0,
+    "stop_price": 151.17142857142858,
+    "target_price": 141.65714285714284
+  }
+]
