@@ -4,8 +4,9 @@ from stockSystem import backtest_tracker as bt
 from stockSystem.backtest import GateResult
 from stockSystem.data_sources import FixtureProvider
 from stockSystem.entry_exit import compute_entry_exit
+from stockSystem.futures_position_sizing import FuturesPositionPlan
 from stockSystem.position_sizing import build_all_combos
-from stockSystem.report import behavior_checklist, format_breadth_summary, render_daily_report, self_check
+from stockSystem.report import behavior_checklist, format_breadth_summary, render_daily_report, render_futures_section, self_check
 from stockSystem.sector_strength import compute_sector_scores, rank_sectors
 from stockSystem.stock_screener import screen_sector
 
@@ -258,3 +259,90 @@ def test_report_breadth_section_has_honest_placeholder_when_not_provided():
         issues=self_check(snapshot),
     )
     assert "無法計算大盤廣度" in report
+
+
+def test_render_futures_section_honest_placeholder_when_none():
+    """2026-09-24 新增：微台指(MXF)當沖建議區塊——呼應使用者要求把系統擴充到期貨當沖。
+    沒有資料時要老實說明原因，不能假裝有訊號。"""
+    lines = render_futures_section(None)
+    assert "微台指(MXF)當沖建議" in lines[0]
+    assert any("無法計算期貨訊號" in line for line in lines)
+
+
+def test_render_futures_section_shows_reason_when_unavailable():
+    lines = render_futures_section({"available": False, "reason": "大盤指數歷史資料不足"})
+    assert any("大盤指數歷史資料不足" in line for line in lines)
+
+
+def test_render_futures_section_neutral_direction_has_no_entry_price():
+    result = {
+        "available": True,
+        "direction": "neutral",
+        "direction_reason": "加權指數均線排列不一致",
+        "as_of_close": 18000.0,
+    }
+    text = "\n".join(render_futures_section(result))
+    assert "中性" in text
+    assert "不建議進場" in text
+    assert "進場參考" not in text
+
+
+def test_render_futures_section_long_direction_shows_entry_exit_and_contracts():
+    position = FuturesPositionPlan(
+        contract_code="MXF", direction="long", contracts=3, margin_used_twd=53550.0,
+        max_loss_twd=1500.0, entry_reference=18000.0, stop_price=17950.0, target_price=18075.0,
+        capital_cap_twd=100000.0,
+    )
+    result = {
+        "available": True,
+        "direction": "long",
+        "direction_reason": "加權指數均線偏多排列",
+        "as_of_close": 18000.0,
+        "entry_reference": 18000.0,
+        "stop_price": 17950.0,
+        "target_price": 18075.0,
+        "caveat": "本區塊訊號是用台股加權指數計算",
+        "position": position,
+    }
+    text = "\n".join(render_futures_section(result))
+    assert "偏多" in text
+    assert "3 口" in text
+
+
+def test_render_futures_section_no_feasible_position_shows_observation_only():
+    result = {
+        "available": True,
+        "direction": "short",
+        "direction_reason": "加權指數均線偏空排列",
+        "as_of_close": 18000.0,
+        "entry_reference": 18000.0,
+        "stop_price": 18200.0,
+        "target_price": 17700.0,
+        "caveat": "本區塊訊號是用台股加權指數計算",
+        "position": None,
+    }
+    text = "\n".join(render_futures_section(result))
+    assert "算不出可行口數" in text
+
+
+def test_render_daily_report_appends_futures_section():
+    """確認 render_daily_report 真的有把期貨區塊接進完整報告，不是只有獨立函式測試過。"""
+    snapshot = FixtureProvider(seed=1).get_snapshot(dt.date.today())
+    scores = compute_sector_scores(snapshot.ohlcv, {3: 0.0, 5: 0.0, 10: 0.0})
+    strongest, weakest = rank_sectors(scores)
+    long_c, _ = screen_sector(snapshot, strongest[0].sector, "long")
+
+    report = render_daily_report(
+        as_of=dt.date.today(),
+        snapshot=snapshot,
+        strongest_sectors=strongest,
+        weakest_sectors=weakest,
+        long_candidates=long_c,
+        short_candidates=[],
+        gate_results={},
+        combos=build_all_combos(long_c),
+        issues=self_check(snapshot),
+        futures_result={"available": False, "reason": "測試用途，本次未提供期貨資料"},
+    )
+    assert "微台指(MXF)當沖建議" in report
+    assert "測試用途，本次未提供期貨資料" in report
