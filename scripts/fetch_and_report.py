@@ -27,6 +27,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from stockSystem import backtest_tracker as bt  # noqa: E402
 from stockSystem.backtest import GateResult  # noqa: E402
+from stockSystem.config import ACCOUNT, SCORING  # noqa: E402
 from stockSystem.data_sources import DataSourceUnavailableError, DataValidationError  # noqa: E402
 from stockSystem.entry_exit import compute_entry_exit  # noqa: E402
 from stockSystem.logging_setup import get_logger, new_run_id  # noqa: E402
@@ -39,7 +40,7 @@ from stockSystem.real_providers import (  # noqa: E402
     _parse_market_rows,
 )
 from stockSystem.report import render_daily_report, self_check  # noqa: E402
-from stockSystem.sector_strength import apply_macro_overlay, compute_sector_scores, rank_sectors  # noqa: E402
+from stockSystem.sector_strength import apply_macro_overlay, compute_sector_scores, market_breadth, rank_sectors  # noqa: E402
 from stockSystem.stock_screener import screen_sector  # noqa: E402
 
 DATA_DIR = REPO_ROOT / "data"
@@ -167,6 +168,22 @@ def main() -> int:
     strongest, weakest = rank_sectors(scores)
     log.info("族群強度排名完成，最強=%s，最弱=%s", strongest[0].sector, weakest[0].sector)
 
+    # 2026-09-24 新增：大盤廣度風控（參考真實策略 FinLab 台股動能策略的設計，見
+    # sector_strength.market_breadth 與 config.SCORING 裡新增的 breadth_* 參數）。
+    # 用「篩選前的全市場股票池」（snapshot.ohlcv，包含所有族群，不只是選進候選清單的股票）
+    # 算廣度，這樣才是真正的「大盤」訊號，而不是候選股自己的廣度（候選股本來就是篩出來的
+    # 強勢股，拿候選股算廣度沒有意義）。
+    breadth_pct = market_breadth(snapshot.ohlcv, window=SCORING.breadth_trend_window)
+    if breadth_pct == breadth_pct and breadth_pct < SCORING.breadth_risk_off_threshold:
+        risk_scale = SCORING.breadth_risk_off_scale
+        log.info("大盤廣度風控觸發：站上%d日均線比例=%.1f%%，低於門檻%.0f%%，部位規模降為%.0f%%",
+                 SCORING.breadth_trend_window, breadth_pct * 100, SCORING.breadth_risk_off_threshold * 100,
+                 risk_scale * 100)
+    else:
+        risk_scale = 1.0
+        breadth_str = f"{breadth_pct * 100:.1f}%" if breadth_pct == breadth_pct else "無法計算"
+        log.info("大盤廣度風控未觸發：站上%d日均線比例=%s", SCORING.breadth_trend_window, breadth_str)
+
     long_candidates = []
     short_candidates = []
     for s in strongest[:3]:
@@ -187,16 +204,25 @@ def main() -> int:
     }
 
     all_candidates_sorted = sorted(long_candidates + short_candidates, key=lambda c: c.score, reverse=True)
-    combos = build_all_combos(all_candidates_sorted)
 
+    # 2026-09-24：entry/stop/target 要先算出來，才能交給 build_all_combos 的風險%部位法
+    # （第4種組合）用止損距離反推張數；原本 combos 是在算 entry_exit 之前就算好的，
+    # 這裡把順序換過來，行為對原本三種組合完全沒有影響（它們不吃 entry_exit_map）。
     long_ee = _entry_exit_for(snapshot, long_candidates)
     short_ee = _entry_exit_for(snapshot, short_candidates)
+    all_ee = {**long_ee, **short_ee}
+
+    combos = build_all_combos(
+        all_candidates_sorted,
+        capital_cap=ACCOUNT.capital_cap_twd * risk_scale,
+        entry_exit_map=all_ee,
+    )
 
     # 自動回測（2026-09-03 使用者要求：「請妳回測」「以後都要自動回測」）：先比對上一個交易日
     # 的候選股有沒有真的觸價，再把「今天」的候選股存下來給明天用——順序不能顛倒，不然今天會
     # 拿自己比對自己。
     backtest_review, backtest_summary = _run_backtest_review(as_of, DATA_DIR, log)
-    bt.save_candidates(DATA_DIR, as_of, long_candidates + short_candidates, {**long_ee, **short_ee})
+    bt.save_candidates(DATA_DIR, as_of, long_candidates + short_candidates, all_ee)
 
     issues = self_check(snapshot) + endpoint_issues
     report_md = render_daily_report(
@@ -213,6 +239,10 @@ def main() -> int:
         short_entry_exit=short_ee,
         backtest_review=backtest_review,
         backtest_summary=backtest_summary,
+        breadth_pct=breadth_pct,
+        breadth_window=SCORING.breadth_trend_window,
+        breadth_threshold=SCORING.breadth_risk_off_threshold,
+        breadth_risk_scale=risk_scale,
     )
 
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -225,6 +255,8 @@ def main() -> int:
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "is_synthetic": snapshot.is_synthetic(),
         "issues": issues,
+        "breadth_pct": breadth_pct if breadth_pct == breadth_pct else None,
+        "breadth_risk_scale": risk_scale,
         "long_candidates": [
             {
                 "stock_id": c.stock_id,
