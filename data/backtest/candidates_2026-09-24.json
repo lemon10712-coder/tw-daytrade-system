@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "8150",
+    "name": "南茂",
+    "direction": "long",
+    "prev_close": 105.5,
+    "entry_reference": 109.33333333333333,
+    "stop_price": 106.51333333333334,
+    "target_price": 114.97333333333331,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6526",
+    "name": "達發",
+    "direction": "long",
+    "prev_close": 764.0,
+    "entry_reference": 813.6666666666666,
+    "stop_price": 791.2095238095237,
+    "target_price": 858.5809523809525,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3014",
+    "name": "聯陽",
+    "direction": "long",
+    "prev_close": 139.0,
+    "entry_reference": 141.5,
+    "stop_price": 139.9142857142857,
+    "target_price": 144.67142857142858,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2493",
+    "name": "揚博",
+    "direction": "long",
+    "prev_close": 194.5,
+    "entry_reference": 195.16666666666666,
+    "stop_price": 187.6238095238095,
+    "target_price": 210.25238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3605",
+    "name": "宏致",
+    "direction": "long",
+    "prev_close": 171.5,
+    "entry_reference": 181.0,
+    "stop_price": 174.18571428571428,
+    "target_price": 194.62857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6715",
+    "name": "嘉基",
+    "direction": "long",
+    "prev_close": 451.5,
+    "entry_reference": 459.8333333333333,
+    "stop_price": 441.14761904761906,
+    "target_price": 497.2047619047618,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7717",
+    "name": "萊德光電-KY",
+    "direction": "long",
+    "prev_close": 592.0,
+    "entry_reference": 611.6666666666666,
+    "stop_price": 582.0952380952381,
+    "target_price": 670.8095238095237,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4904",
+    "name": "遠傳",
+    "direction": "long",
+    "prev_close": 105.5,
+    "entry_reference": 105.66666666666667,
+    "stop_price": 104.98095238095239,
+    "target_price": 107.03809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2455",
+    "name": "全新",
+    "direction": "long",
+    "prev_close": 547.0,
+    "entry_reference": 546.3333333333334,
+    "stop_price": 530.9904761904762,
+    "target_price": 577.0190476190477,
+    "atr_multiple": 1.2
+  }
+]
