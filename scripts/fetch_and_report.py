@@ -50,6 +50,7 @@ from stockSystem.stock_screener import screen_sector  # noqa: E402
 
 DATA_DIR = REPO_ROOT / "data"
 REPORTS_DIR = REPO_ROOT / "reports"
+REPORTS_JSON_DIR = DATA_DIR / "reports_json"
 TAIPEI = ZoneInfo("Asia/Taipei")
 
 
@@ -91,7 +92,7 @@ def _run_backtest_review(as_of: dt.date, data_dir: Path, log) -> tuple[list, dic
             actual = actual_rows.get(record["stock_id"])
             if actual is None:
                 log.warning("回測比對：%s 當天(%s)的真實收盤資料裡找不到 %s，略過這一檔",
-                           record["stock_id"], prev_date, record["stock_id"])
+                            record["stock_id"], prev_date, record["stock_id"])
                 continue
             outcomes.append(bt.evaluate_outcome(
                 record, actual["open"], actual["high"], actual["low"], actual["close"]
@@ -370,6 +371,20 @@ def main() -> int:
         ],
     }
     (DATA_DIR / "latest.json").write_text(json.dumps(latest_json, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # 2026-09-24 新增：除了覆寫 latest.json（只留「最新一天」），另外逐日存一份到
+    # data/reports_json/YYYY-MM-DD.json——latest.json 每天會被蓋掉，沒辦法回頭查任何一天
+    # 的結構化資料；這裡存的是同一份內容，只是多存一份不會被覆蓋的逐日副本，給之後
+    # scripts/build_site.py 產生的部落格網站、以及 Claude Artifact 儀表板用，讓「今天以外
+    # 的任一天」也能拿到結構化資料，不用只能解析 markdown 純文字。跟 latest.json 一樣，
+    # 這是報告本體（上面的 .md）以外的附加品，寫入失敗不影響報告本身是否成功產生。
+    try:
+        REPORTS_JSON_DIR.mkdir(parents=True, exist_ok=True)
+        (REPORTS_JSON_DIR / f"{as_of.isoformat()}.json").write_text(
+            json.dumps(latest_json, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("逐日結構化 JSON 存檔失敗（不影響報告本身）: %r", exc)
 
     log.info("報告已寫出: %s", out_path)
     print(report_md)
