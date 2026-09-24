@@ -1,6 +1,6 @@
 {
   "as_of": "2026-09-24",
-  "generated_at": "2026-09-24T04:54:04.972381+00:00",
+  "generated_at": "2026-09-24T06:11:50.748824+00:00",
   "is_synthetic": false,
   "issues": [
     "股價資料存在缺漏值",
@@ -9,6 +9,14 @@
   ],
   "breadth_pct": null,
   "breadth_risk_scale": 1.0,
+  "futures": {
+    "available": true,
+    "direction": "long",
+    "entry": 48024.6,
+    "stop": 47191.921714285716,
+    "target": 49273.61742857143,
+    "contracts": null
+  },
   "long_candidates": [
     {
       "stock_id": "8150",
