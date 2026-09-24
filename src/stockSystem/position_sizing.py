@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from stockSystem.config import ACCOUNT
+from stockSystem.config import ACCOUNT, RISK_SIZING
 
 
 @dataclass
@@ -25,7 +25,7 @@ class PositionLine:
 
 @dataclass
 class ComboPlan:
-    label: str            # "集中單押" / "核心＋衛星" / "分散配置"
+    label: str            # "集中單押" / "核心＋衛星" / "分散配置" / "風險%部位法(海龜式)"
     lines: list
     total_cost: float
     remaining: float
@@ -116,10 +116,75 @@ def build_core_satellite(
     return ComboPlan(label="核心＋衛星", lines=lines, total_cost=total, remaining=capital_cap - total)
 
 
-def build_all_combos(candidates: list, capital_cap: float = ACCOUNT.capital_cap_twd) -> list[ComboPlan]:
+def build_risk_based(
+    candidates: list,
+    entry_exit_map: dict,
+    capital_cap: float = ACCOUNT.capital_cap_twd,
+    risk_pct: float = RISK_SIZING.risk_pct_per_trade,
+    n: int = RISK_SIZING.max_candidates,
+) -> ComboPlan | None:
+    """風險百分比部位法：參考海龜交易系統（Turtle Trading System）真實方法論。
+
+    跟其他三個組合的差別：其他三個都是「先決定要花多少錢，再看能買幾張」；這個組合反過來，
+    先決定「萬一看錯、真的觸及止損時最多願意虧總額度的 risk_pct（預設1%，跟海龜系統原始
+    設計一致）」，再用「止損距離(entry-stop的價差) x 每張股數」反推可以買幾張。這樣波動大
+    （止損距離遠）的標的會自動分配到比較少張數，波動小的可以分配到比較多張數，讓每一檔
+    候選股「看錯的風險」盡量拉齊，而不是像集中單押/分散配置那樣，只看「花多少錢」、完全
+    沒管每檔股票的波動度差異有多大。
+
+    需要 entry_exit_map（stock_id -> EntryExitPlan，見 entry_exit.compute_entry_exit）才能
+    算出止損距離；沒有進出場計畫的候選股直接跳過，不用其他價位硬湊一個假的風險距離。
+    """
+    risk_budget_total = capital_cap * risk_pct
+
+    feasible = []
+    for c in candidates:
+        if not feasibility_check(c.price, capital_cap):
+            continue
+        ee = entry_exit_map.get(c.stock_id)
+        if ee is None:
+            continue
+        risk_per_share = abs(ee.entry_reference - ee.stop_price)
+        if risk_per_share <= 0:
+            continue
+        feasible.append((c, risk_per_share))
+    feasible = feasible[:n]
+    if not feasible:
+        return None
+
+    lines = []
+    remaining = capital_cap
+    slots_left = len(feasible)
+    for c, risk_per_share in feasible:
+        risk_budget_share = risk_budget_total / slots_left
+        slots_left -= 1
+        risk_per_lot = risk_per_share * ACCOUNT.lot_size
+        lots_by_risk = int(risk_budget_share // risk_per_lot) if risk_per_lot > 0 else 0
+        lots_by_cash = _max_lots_within_budget(c.price, remaining)
+        lots = max(0, min(lots_by_risk, lots_by_cash))
+        if lots < 1:
+            continue
+        cost = lots * lot_cost(c.price)
+        lines.append(PositionLine(stock_id=c.stock_id, direction=c.direction, price=c.price, lots=lots, cost=cost))
+        remaining -= cost
+    if not lines:
+        return None
+    total = sum(l.cost for l in lines)
+    return ComboPlan(label="風險%部位法(海龜式)", lines=lines, total_cost=total, remaining=capital_cap - total)
+
+
+def build_all_combos(
+    candidates: list,
+    capital_cap: float = ACCOUNT.capital_cap_twd,
+    entry_exit_map: dict | None = None,
+) -> list[ComboPlan]:
     combos = [
         build_concentrated(candidates, capital_cap),
         build_core_satellite(candidates, capital_cap),
         build_diversified(candidates, capital_cap),
     ]
+    if entry_exit_map:
+        # 2026-09-24 新增第 4 種組合：只有在呼叫端有算好進出場計畫時才加進來，
+        # 沒有 entry_exit_map（例如舊呼叫端、或測試只想看前三種組合）就保持原本行為不變。
+        combos.append(build_risk_based(candidates, entry_exit_map, capital_cap))
     return [c for c in combos if c is not None]

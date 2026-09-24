@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from stockSystem.config import ACCOUNT
+from stockSystem.config import ACCOUNT, SCORING
 from stockSystem.technicals import atr_from_close_series
 
 
@@ -34,6 +34,10 @@ class EntryExitPlan:
     target_basis: str
     risk_pct: float
     reward_risk_ratio: float
+    atr_multiple: float = SCORING.atr_stop_multiple
+    # 2026-09-24 新增：把實際用來算這筆止損的 ATR 倍數存下來（而不是只留在字串裡），
+    # 讓 backtest_tracker.py 可以照倍數分組累積統計，未來用真實樣本比較不同倍數的表現，
+    # 而不是只能憑印象猜「好像比較常觸及止損」。
     is_approximation: bool = True
     caveat: str = (
         "本模組目前只有日成交資訊可用，VWAP／進場拉回位置為日線近似值，非真實逐筆VWAP；"
@@ -59,7 +63,7 @@ def compute_entry_exit(
     low: float,
     close: float,
     close_hist,
-    atr_multiple: float = 1.2,
+    atr_multiple: float = SCORING.atr_stop_multiple,
     reward_risk_ratio: float = 2.0,
 ) -> EntryExitPlan:
     """規劃書 7.2-7.4 節的具體實作：
@@ -67,6 +71,8 @@ def compute_entry_exit(
     進場參考：用日線近似 VWAP（(high+low+close)/3）當作拉回測試的參考位置——
         多方：預期拉回不破這個價位；空方：預期反彈不過這個價位。
     止損：用 ATR 的 atr_multiple 倍當作波動性止損距離（規劃書 7.3 節）。
+        2026-09-24 起預設值改讀 SCORING.atr_stop_multiple（可調參數），不再是寫死的 1.2，
+        但預設數值本身沒變，既有呼叫端/測試的行為不受影響。
     停利：用風險報酬比法（規劃書 7.4 節「最推薦、最機械化」的做法），
         不去預測「最高會到多少錢」，只維持贏面比輸面大的結構。
     """
@@ -112,4 +118,5 @@ def compute_entry_exit(
         target_basis=target_basis,
         risk_pct=risk_pct,
         reward_risk_ratio=reward_risk_ratio,
+        atr_multiple=atr_multiple,
     )

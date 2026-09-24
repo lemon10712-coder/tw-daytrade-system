@@ -67,8 +67,43 @@ class ScoringConfig:
     min_liquidity_avg_volume_lots: int = 200  # 近20日均量門檻（單位：張），排除流動性太差的股票
     min_price_twd: float = 100.0  # 2026-09-03 使用者要求：只列股價100元以上的股票（用當天收盤價判斷）
 
+    # 2026-09-24 使用者要求：參考真實策略（FinLab 台股動能策略、海龜交易系統）幫系統加參數，
+    # 這裡新增兩組可調參數，不是憑感覺、也不是照抄別人的預設值，而是把「值」跟「機制」分開：
+    # 機制先做出來、可以調，實際要用多少由 backtest_tracker.py 之後累積的真實樣本決定。
+
+    # 止損距離 = ATR(14) * 這個倍數（見 entry_exit.py compute_entry_exit）。
+    # 預設沿用原本就在用的 1.2 倍，刻意不因為海龜交易系統用 2 倍就跟著改——
+    # 真實台股回測（FinLab，月頻動能策略、2018-2026）顯示把 ATR 停損倍數放寬到 2-3 倍，
+    # 反而讓 CAGR 從 8.0% 掉到 -3.6%/-0.4%、MaxDD 惡化到 -57.4%/-55.3%（洗出場、
+    # 賣在阿呆谷、換手率大增），可見「別人用的倍數」不能直接照搬到不同的策略/市場條件。
+    # 所以先把它做成可調參數，讓 backtest_tracker.py 逐日累積「這個倍數實際被觸發後的
+    # 真實表現」，未來用數據而不是直覺決定要不要調整。
+    atr_stop_multiple: float = 1.2
+
+    # 大盤廣度風控（參考 FinLab 真實台股動能策略：全市場站上60日均線比例 <= 40% 時減碼）。
+    # breadth_trend_window 沿用 ma_windows 裡本來就有的第4個窗口(60)，不是另外發明新窗口。
+    breadth_trend_window: int = 60
+    breadth_risk_off_threshold: float = 0.40  # 廣度低於這個比例視為「大盤環境偏空」
+    breadth_risk_off_scale: float = 0.5       # 觸發風控時，部位規模（額度上限）乘上這個係數
+
+
+@dataclass(frozen=True)
+class RiskSizingConfig:
+    """風險百分比部位法的參數（見 position_sizing.build_risk_based）。
+
+    2026-09-24 新增，方法論參考海龜交易系統（Turtle Trading System，Richard Dennis）
+    真實文獻的核心設計：每一個 unit 的風險預算 = 帳戶規模的固定百分比（原始設計為 1%），
+    不是像「集中單押/核心＋衛星/分散配置」那樣先決定要花多少錢，而是先決定「萬一看錯、
+    觸及止損時最多願意虧多少」，再反推張數——波動大（止損距離遠）的部位會自動配置得少，
+    波動小的可以配置得多，讓每一檔候選股「看錯的風險」盡量一致。
+    """
+
+    risk_pct_per_trade: float = 0.01  # 每檔部位的風險預算 = capital_cap * 這個比例；1% 為海龜系統原始設計值
+    max_candidates: int = 3           # 最多分配到幾檔候選股，避免過度分散成太多小部位
+
 
 ACCOUNT = AccountConfig()
 MARKET = MarketConfig()
 VALIDATION = ValidationConfig()
 SCORING = ScoringConfig()
+RISK_SIZING = RiskSizingConfig()

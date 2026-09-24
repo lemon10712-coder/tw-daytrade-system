@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from stockSystem.technicals import volume_expansion_ratio
+from stockSystem.technicals import moving_average, volume_expansion_ratio
 
 
 @dataclass
@@ -124,3 +124,32 @@ def rank_sectors(scores: list[SectorScore]) -> tuple[list[SectorScore], list[Sec
     """回傳 (最強排序, 最弱排序)，皆由強到弱排列，供上層各取所需。"""
     ranked = sorted(scores, key=lambda s: s.composite_score, reverse=True)
     return ranked, list(reversed(ranked))
+
+
+def market_breadth(ohlcv: pd.DataFrame, window: int = 60) -> float:
+    """全市場（篩選後的股票池）裡，收盤價站上 `window` 日均線的比例。
+
+    2026-09-24 新增：參考真實策略（FinLab 台股動能策略）的大盤廣度風控設計——那套策略
+    用「全市場站上60日均線比例 <= 40%」當作系統性風險訊號，訊號觸發時把部位規模減半，
+    而不是逐檔看技術面評分（族群/個股分數再高，如果多數股票都在均線之下，代表當下
+    環境本身偏空，個股層級的訊號在這種環境下比較容易失效）。
+
+    這裡刻意重用 ohlcv 裡本來就有的 close_hist（跟 compute_sector_scores 用的是同一份
+    資料），不需要另外接資料源；window 預設 60，對應 SCORING.ma_windows 裡本來就有的
+    第 4 個窗口，不是另外發明一個新的均線天數。
+
+    資料不足（沒有任何股票有 >= window 天的收盤價）時回傳 nan，呼叫端應該把 nan
+    視為「這次無法判斷廣度」，維持預設部位，而不是當成 0% 觸發風控。
+    """
+    ups = 0
+    total = 0
+    for close_hist in ohlcv["close_hist"]:
+        if len(close_hist) < window:
+            continue
+        ma = moving_average(close_hist, window)
+        if np.isnan(ma):
+            continue
+        total += 1
+        if close_hist[-1] > ma:
+            ups += 1
+    return ups / total if total else float("nan")

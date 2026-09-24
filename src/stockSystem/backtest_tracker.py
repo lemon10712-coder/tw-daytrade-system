@@ -17,6 +17,12 @@
 目前只有日成交的開高低收，沒有分鐘級/逐筆資料，沒辦法知道「當天到底是先碰到止損還是先碰到
 停利」的真實時間順序——如果同一天最高價超過停利、最低價也跌破止損，這裡老實標成「同一天內
 止損/停利都被觸及，用日資料無法判斷實際先後順序」，不去猜。
+
+**2026-09-24 新增：記錄每一筆用的 ATR 停損倍數**（呼應 config.SCORING.atr_stop_multiple
+改為可調參數）。目的是讓「調整倍數」不再是憑直覺猜，而是能用真實累積的樣本比較——
+如果之後把倍數從 1.2 調成別的值，`append_summary` 會依倍數分組統計，讓使用者/未來的
+session 可以直接比較「1.2倍那些天」vs「新倍數那些天」的進場觸價率、止損/停利比例，
+而不必自己重新翻歷史資料手動算。
 """
 
 from __future__ import annotations
@@ -41,6 +47,7 @@ class BacktestOutcome:
     actual_close: float
     entry_touched: bool
     result: str  # 人類可讀的結果說明，見 evaluate_outcome()
+    atr_multiple: float | None = None  # 這筆記錄用的 ATR 停損倍數；舊記錄沒有這個欄位時為 None
 
 
 def _backtest_dir(data_dir: Path) -> Path:
@@ -54,6 +61,10 @@ def save_candidates(data_dir: Path, as_of: dt.date, candidates: list, entry_exit
 
     只存「有算出進出場計畫」的候選股（entry_exit_map 裡找得到的），欄位刻意保持精簡、
     只留評測會用到的數字，方便之後直接看 JSON 內容除錯。
+
+    2026-09-24：多存一個 atr_multiple 欄位（用 getattr 安全取值，避免傳進來的 ee 物件
+    是測試用的簡化假物件、沒有這個屬性時整個函式直接壞掉——沒有的話就存 None，跟舊資料
+    的行為一致）。
     """
     records = []
     for c in candidates:
@@ -68,6 +79,7 @@ def save_candidates(data_dir: Path, as_of: dt.date, candidates: list, entry_exit
             "entry_reference": ee.entry_reference,
             "stop_price": ee.stop_price,
             "target_price": ee.target_price,
+            "atr_multiple": getattr(ee, "atr_multiple", None),
         })
     out_path = _backtest_dir(data_dir) / f"candidates_{as_of.isoformat()}.json"
     out_path.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -145,6 +157,7 @@ def evaluate_outcome(
         actual_close=actual_close,
         entry_touched=entry_touched,
         result=result,
+        atr_multiple=record.get("atr_multiple"),
     )
 
 
@@ -153,6 +166,11 @@ def append_summary(data_dir: Path, evaluated_date: dt.date, outcomes: list[Backt
 
     冪等設計：同一個 `evaluated_date` 重複呼叫不會重複累加（先移除舊的同日紀錄再加回去），
     這樣即使某天報告因故重跑一次，統計數字也不會被灌水。
+
+    2026-09-24 新增 `by_atr_multiple`：除了原本跨全部樣本的 `cumulative`，額外依每筆記錄
+    用的 `atr_multiple` 分組統計。用意是讓「要不要調整 ATR 停損倍數」這件事，之後可以直接
+    比較不同倍數底下的進場觸價率／止損停利比例，而不是只有一組看不出倍數影響的總數字。
+    倍數缺漏（舊資料、或測試用的簡化物件）一律歸類到 "unknown" 分組，不會讓整個函式報錯。
     """
     summary_path = _backtest_dir(data_dir) / "summary.json"
     if summary_path.exists():
@@ -168,6 +186,7 @@ def append_summary(data_dir: Path, evaluated_date: dt.date, outcomes: list[Backt
         "hit_target_only": sum(1 for o in outcomes if o.entry_touched and "停利參考價" in o.result and "同一天" not in o.result),
         "both_same_day": sum(1 for o in outcomes if "同一天都被觸及" in o.result),
         "neither": sum(1 for o in outcomes if o.entry_touched and o.result == "觸及進場參考價後，收盤前尚未觸及止損或停利"),
+        "atr_multiples_used": sorted({o.atr_multiple for o in outcomes if o.atr_multiple is not None}),
     }
 
     totals = {"total_candidates": 0, "entry_touched": 0, "hit_stop_only": 0, "hit_target_only": 0, "both_same_day": 0, "neither": 0}
@@ -179,6 +198,34 @@ def append_summary(data_dir: Path, evaluated_date: dt.date, outcomes: list[Backt
         round(totals["entry_touched"] / totals["total_candidates"], 4) if totals["total_candidates"] else None
     )
     summary["cumulative"]["sample_trading_days"] = len(summary["by_date"])
+
+    # 依 ATR 倍數重新彙整全部歷史 outcomes 的分組統計。這裡假設「同一天所有候選股都用同一個
+    # atr_multiple」——這在目前的系統設計下必然成立，因為 atr_multiple 來自單一的全域設定
+    # SCORING.atr_stop_multiple，同一次報告執行不會有兩個不同的值。在這個前提下，把該天
+    # 的整天統計歸進它唯一用過的那個倍數分組，數字是精確的，不是估計值；`atr_multiples_used`
+    # 存成清單只是為了在未來真的允許「同一天不同候選股用不同倍數」時，容易發現這個假設被
+    # 打破（多於 1 個值），需要回來改成逐檔分組。
+    by_multiple: dict = {}
+    for date_str, day_stats in summary["by_date"].items():
+        multiples_used = day_stats.get("atr_multiples_used", [])
+        if len(multiples_used) > 1:
+            # 假設被打破（同一天出現多個倍數）：無法安全歸類整天總數到單一分組，跳過這天的
+            # 分組統計，避免用錯誤假設算出誤導性的數字。cumulative（跨全部樣本）不受影響。
+            continue
+        for multiple in multiples_used:
+            key = str(multiple)
+            bucket = by_multiple.setdefault(key, {
+                "total_candidates": 0, "entry_touched": 0, "hit_stop_only": 0,
+                "hit_target_only": 0, "both_same_day": 0, "neither": 0, "trading_days": 0,
+            })
+            bucket["trading_days"] += 1
+            for k in ("total_candidates", "entry_touched", "hit_stop_only", "hit_target_only", "both_same_day", "neither"):
+                bucket[k] += day_stats.get(k, 0)
+    for bucket in by_multiple.values():
+        bucket["entry_touch_rate"] = (
+            round(bucket["entry_touched"] / bucket["total_candidates"], 4) if bucket["total_candidates"] else None
+        )
+    summary["by_atr_multiple"] = by_multiple
 
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     return summary

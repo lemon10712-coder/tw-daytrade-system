@@ -70,6 +70,29 @@ def format_intl_summary(intl_snapshot: dict) -> str:
     return "、".join(parts) + f" → 總經氣氛：{sentiment}"
 
 
+def format_breadth_summary(
+    breadth_pct: float | None,
+    window: int = 60,
+    threshold: float = 0.40,
+    risk_scale: float = 1.0,
+) -> str:
+    """2026-09-24 新增：大盤廣度風控狀態的文字說明（參考真實策略 FinLab 台股動能策略的
+    「全市場站上60日均線比例 <= 40% 就減碼」設計，見 sector_strength.market_breadth）。
+
+    breadth_pct 是 None 或 nan 時，代表這次資料不足以算出廣度（例如股票池太小），
+    老實說「無法計算」，並且明確講「維持預設部位」，不讓使用者誤以為系統偷偷降過部位、
+    也不讓系統在資料不足時錯誤地觸發風控。
+    """
+    if breadth_pct is None or breadth_pct != breadth_pct:  # None 或 NaN
+        return "（本次無法計算大盤廣度，風控維持預設部位）"
+    line = f"全市場站上{window}日均線比例：{breadth_pct:.0%}（風控門檻 {threshold:.0%}）"
+    if risk_scale < 1.0:
+        line += f" → ⚠️ 已觸發大盤廣度風控，本次「資金配置建議組合」部位規模降為原本的 {risk_scale:.0%}"
+    else:
+        line += " → 未觸發廣度風控，部位規模維持原額度"
+    return line
+
+
 def render_daily_report(
     as_of: dt.date,
     snapshot: MarketSnapshot,
@@ -84,6 +107,10 @@ def render_daily_report(
     short_entry_exit: dict | None = None,
     backtest_review: list | None = None,   # [backtest_tracker.BacktestOutcome, ...]，上一交易日候選股的真實結果
     backtest_summary: dict | None = None,  # backtest_tracker.append_summary() 回傳的累積統計
+    breadth_pct: float | None = None,      # sector_strength.market_breadth() 的結果，見 format_breadth_summary
+    breadth_window: int = 60,
+    breadth_threshold: float = 0.40,
+    breadth_risk_scale: float = 1.0,
 ) -> str:
     lines = []
     is_test = snapshot.is_synthetic()
@@ -129,8 +156,9 @@ def render_daily_report(
             )
             lines.append("")
 
-    lines.append("## 2. 國際情勢摘要")
+    lines.append("## 2. 大盤環境摘要")
     lines.append(format_intl_summary(snapshot.intl_snapshot))
+    lines.append(format_breadth_summary(breadth_pct, breadth_window, breadth_threshold, breadth_risk_scale))
     lines.append("")
 
     lines.append("## 3. 族群強度排行榜")
