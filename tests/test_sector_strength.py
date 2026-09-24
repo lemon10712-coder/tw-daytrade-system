@@ -2,9 +2,10 @@ import datetime as dt
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from stockSystem.data_sources import FixtureProvider
-from stockSystem.sector_strength import apply_macro_overlay, compute_sector_scores, rank_sectors
+from stockSystem.sector_strength import apply_macro_overlay, compute_sector_scores, market_breadth, rank_sectors
 
 
 def _get_scores():
@@ -94,3 +95,33 @@ def test_composite_score_not_dominated_by_single_outlier_stock():
         f"中位數彙總應該不受單一離群值主宰，但算出 {sector_score.volume_expansion}倍，"
         "看起來還是被單一股票拉走了"
     )
+
+
+def _breadth_ohlcv(n_above: int, n_below: int, window: int = 60) -> pd.DataFrame:
+    rows = {}
+    for i in range(n_above):
+        # 持續上漲的序列：最後一天收盤價必然高於60日均線
+        rows[f"up_{i}"] = np.linspace(80.0, 120.0, window + 5)
+    for i in range(n_below):
+        # 持續下跌的序列：最後一天收盤價必然低於60日均線
+        rows[f"down_{i}"] = np.linspace(120.0, 80.0, window + 5)
+    return pd.DataFrame({"close_hist": list(rows.values())}, index=list(rows.keys()))
+
+
+def test_market_breadth_reflects_ratio_of_stocks_above_trend_ma():
+    """2026-09-24 新增：大盤廣度風控的核心計算——參考真實策略(FinLab台股動能策略)
+    「全市場站上60日均線比例」的定義，這裡用單純的上漲/下跌股票組合驗證比例算對。"""
+    ohlcv = _breadth_ohlcv(n_above=3, n_below=7, window=60)
+    breadth = market_breadth(ohlcv, window=60)
+    assert breadth == pytest.approx(0.3)
+
+
+def test_market_breadth_is_nan_when_insufficient_data():
+    ohlcv = pd.DataFrame({"close_hist": [np.linspace(80.0, 120.0, 10)]}, index=["only_stock"])
+    breadth = market_breadth(ohlcv, window=60)
+    assert np.isnan(breadth)
+
+
+def test_market_breadth_all_above_is_one():
+    ohlcv = _breadth_ohlcv(n_above=5, n_below=0, window=60)
+    assert market_breadth(ohlcv, window=60) == pytest.approx(1.0)

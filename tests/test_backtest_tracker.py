@@ -128,3 +128,80 @@ def test_append_summary_is_idempotent_for_same_date(tmp_path):
     summary = bt.append_summary(tmp_path, dt.date(2026, 9, 3), [outcome])
 
     assert summary["cumulative"]["total_candidates"] == 1
+
+
+class _FakeEntryExitWithMultiple(_FakeEntryExit):
+    def __init__(self, prev_close, entry, stop, target, atr_multiple):
+        super().__init__(prev_close, entry, stop, target)
+        self.atr_multiple = atr_multiple
+
+
+def test_save_candidates_records_atr_multiple_when_present(tmp_path):
+    """2026-09-24 新增：呼應使用者核准的「重新檢視ATR停損倍數」需求——記錄每一筆用的
+    倍數，未來才能依倍數分組比較真實表現。"""
+    candidates = [_FakeCandidate("1303", "南亞", "long")]
+    ee_map = {"1303": _FakeEntryExitWithMultiple(237.50, 239.17, 228.28, 260.94, atr_multiple=1.2)}
+    as_of = dt.date(2026, 9, 3)
+
+    bt.save_candidates(tmp_path, as_of, candidates, ee_map)
+    loaded = bt.load_candidates(tmp_path, as_of)
+
+    assert loaded[0]["atr_multiple"] == 1.2
+
+
+def test_save_candidates_defaults_atr_multiple_to_none_when_ee_lacks_attribute(tmp_path):
+    """向後相容：傳進來的 entry_exit 物件（例如舊呼叫端或簡化測試假物件）沒有 atr_multiple
+    屬性時，不應該讓整個存檔動作報錯，應該老實存 None。"""
+    candidates = [_FakeCandidate("1303", "南亞", "long")]
+    ee_map = {"1303": _FakeEntryExit(237.50, 239.17, 228.28, 260.94)}  # 沒有 atr_multiple 屬性
+    as_of = dt.date(2026, 9, 3)
+
+    bt.save_candidates(tmp_path, as_of, candidates, ee_map)
+    loaded = bt.load_candidates(tmp_path, as_of)
+
+    assert loaded[0]["atr_multiple"] is None
+
+
+def test_evaluate_outcome_carries_atr_multiple_through_from_record():
+    record = {
+        "stock_id": "1303", "name": "南亞", "direction": "long",
+        "prev_close": 237.50, "entry_reference": 239.17,
+        "stop_price": 228.28, "target_price": 260.94, "atr_multiple": 1.5,
+    }
+    outcome = bt.evaluate_outcome(record, actual_open=243.0, actual_high=244.5, actual_low=219.5, actual_close=221.0)
+    assert outcome.atr_multiple == 1.5
+
+
+def test_evaluate_outcome_atr_multiple_defaults_to_none_when_missing_from_record():
+    # 呼應既有測試裡不帶 atr_multiple 的 record（見本檔案其他測試），不應該報 KeyError
+    record = {
+        "stock_id": "9999", "name": "測試", "direction": "long",
+        "prev_close": 100.0, "entry_reference": 100.0,
+        "stop_price": 95.0, "target_price": 105.0,
+    }
+    outcome = bt.evaluate_outcome(record, actual_open=100.0, actual_high=101.0, actual_low=99.0, actual_close=100.5)
+    assert outcome.atr_multiple is None
+
+
+def test_append_summary_groups_cumulative_stats_by_atr_multiple(tmp_path):
+    """核心驗證：累積統計要能依 ATR 倍數分組，讓使用者/未來的 session 可以比較「用1.2倍
+    的那些交易日」跟「用其他倍數的那些交易日」的進場觸價率等指標，而不是只有一個看不出
+    倍數影響的總數字。"""
+    outcome_1_2 = bt.evaluate_outcome(
+        {"stock_id": "1303", "name": "南亞", "direction": "long",
+         "entry_reference": 239.17, "stop_price": 228.28, "target_price": 260.94, "atr_multiple": 1.2},
+        actual_open=243.0, actual_high=244.5, actual_low=219.5, actual_close=221.0,
+    )
+    outcome_2_0 = bt.evaluate_outcome(
+        {"stock_id": "2812", "name": "台中銀", "direction": "long",
+         "entry_reference": 20.5, "stop_price": 19.5, "target_price": 22.5, "atr_multiple": 2.0},
+        actual_open=21.5, actual_high=22.0, actual_low=21.2, actual_close=21.8,
+    )
+
+    bt.append_summary(tmp_path, dt.date(2026, 9, 2), [outcome_1_2])
+    summary = bt.append_summary(tmp_path, dt.date(2026, 9, 3), [outcome_2_0])
+
+    assert summary["by_atr_multiple"]["1.2"]["total_candidates"] == 1
+    assert summary["by_atr_multiple"]["1.2"]["entry_touched"] == 1
+    assert summary["by_atr_multiple"]["2.0"]["total_candidates"] == 1
+    assert summary["by_atr_multiple"]["2.0"]["entry_touched"] == 0

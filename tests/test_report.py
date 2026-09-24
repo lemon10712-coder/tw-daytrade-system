@@ -5,7 +5,7 @@ from stockSystem.backtest import GateResult
 from stockSystem.data_sources import FixtureProvider
 from stockSystem.entry_exit import compute_entry_exit
 from stockSystem.position_sizing import build_all_combos
-from stockSystem.report import behavior_checklist, render_daily_report, self_check
+from stockSystem.report import behavior_checklist, format_breadth_summary, render_daily_report, self_check
 from stockSystem.sector_strength import compute_sector_scores, rank_sectors
 from stockSystem.stock_screener import screen_sector
 
@@ -191,3 +191,70 @@ def test_behavior_checklist_empty_when_nothing_triggered():
         extreme_move_candidates=[],
     )
     assert reminders == []
+
+
+def test_format_breadth_summary_reports_unavailable_when_none():
+    assert "無法計算" in format_breadth_summary(None)
+
+
+def test_format_breadth_summary_reports_unavailable_when_nan():
+    assert "無法計算" in format_breadth_summary(float("nan"))
+
+
+def test_format_breadth_summary_flags_risk_off_when_scale_below_one():
+    text = format_breadth_summary(0.25, window=60, threshold=0.40, risk_scale=0.5)
+    assert "25%" in text
+    assert "風控" in text and "50%" in text
+
+
+def test_format_breadth_summary_notes_no_trigger_when_scale_is_one():
+    text = format_breadth_summary(0.80, window=60, threshold=0.40, risk_scale=1.0)
+    assert "未觸發" in text
+
+
+def test_report_includes_breadth_summary_when_provided():
+    """2026-09-24 新增：呼應使用者核准的「大盤廣度」風控開關——報告要能顯示廣度狀態，
+    不是算完就丟掉。"""
+    snapshot = FixtureProvider(seed=1).get_snapshot(dt.date.today())
+    scores = compute_sector_scores(snapshot.ohlcv, {3: 0.0, 5: 0.0, 10: 0.0})
+    strongest, weakest = rank_sectors(scores)
+    long_c, _ = screen_sector(snapshot, strongest[0].sector, "long")
+
+    report = render_daily_report(
+        as_of=dt.date.today(),
+        snapshot=snapshot,
+        strongest_sectors=strongest,
+        weakest_sectors=weakest,
+        long_candidates=long_c,
+        short_candidates=[],
+        gate_results={},
+        combos=build_all_combos(long_c),
+        issues=self_check(snapshot),
+        breadth_pct=0.25,
+        breadth_window=60,
+        breadth_threshold=0.40,
+        breadth_risk_scale=0.5,
+    )
+    assert "大盤環境摘要" in report
+    assert "25%" in report
+    assert "風控" in report
+
+
+def test_report_breadth_section_has_honest_placeholder_when_not_provided():
+    snapshot = FixtureProvider(seed=1).get_snapshot(dt.date.today())
+    scores = compute_sector_scores(snapshot.ohlcv, {3: 0.0, 5: 0.0, 10: 0.0})
+    strongest, weakest = rank_sectors(scores)
+    long_c, _ = screen_sector(snapshot, strongest[0].sector, "long")
+
+    report = render_daily_report(
+        as_of=dt.date.today(),
+        snapshot=snapshot,
+        strongest_sectors=strongest,
+        weakest_sectors=weakest,
+        long_candidates=long_c,
+        short_candidates=[],
+        gate_results={},
+        combos=build_all_combos(long_c),
+        issues=self_check(snapshot),
+    )
+    assert "無法計算大盤廣度" in report
