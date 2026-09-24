@@ -22,14 +22,19 @@ import sys
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import numpy as np
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from stockSystem import backtest_tracker as bt  # noqa: E402
 from stockSystem.backtest import GateResult  # noqa: E402
-from stockSystem.config import ACCOUNT, SCORING  # noqa: E402
+from stockSystem.config import ACCOUNT, FUTURES, SCORING  # noqa: E402
 from stockSystem.data_sources import DataSourceUnavailableError, DataValidationError  # noqa: E402
 from stockSystem.entry_exit import compute_entry_exit  # noqa: E402
+from stockSystem.futures_data import IndexDailyStore, _fetch_twse_index_ohlc  # noqa: E402
+from stockSystem.futures_position_sizing import build_futures_position  # noqa: E402
+from stockSystem.futures_signals import compute_futures_entry_exit, decide_direction  # noqa: E402
 from stockSystem.logging_setup import get_logger, new_run_id  # noqa: E402
 from stockSystem.position_sizing import build_all_combos  # noqa: E402
 from stockSystem.real_providers import (  # noqa: E402
@@ -86,7 +91,7 @@ def _run_backtest_review(as_of: dt.date, data_dir: Path, log) -> tuple[list, dic
             actual = actual_rows.get(record["stock_id"])
             if actual is None:
                 log.warning("回測比對：%s 當天(%s)的真實收盤資料裡找不到 %s，略過這一檔",
-                            record["stock_id"], prev_date, record["stock_id"])
+                           record["stock_id"], prev_date, record["stock_id"])
                 continue
             outcomes.append(bt.evaluate_outcome(
                 record, actual["open"], actual["high"], actual["low"], actual["close"]
@@ -98,6 +103,91 @@ def _run_backtest_review(as_of: dt.date, data_dir: Path, log) -> tuple[list, dic
     except Exception as exc:  # noqa: BLE001
         log.warning("自動回測比對整體失敗，本次報告不含回測區塊（不影響報告其他部分）: %r", exc)
         return [], None
+
+
+def _run_futures_section(as_of: dt.date, data_dir: Path, log, breadth_pct: float | None) -> dict:
+    """2026-09-24 新增：微台指(MXF)當沖建議區塊的資料準備。整段包在 try/except 裡，
+    任何一步失敗都只回傳「不可用＋原因」，不會讓股票報告的其他部分掛掉——這個區塊是
+    在既有股票系統之上新增的獨立模組，錦上添花，不是核心資料（呼應 `_run_backtest_review`
+    同一套「錦上添花區塊失敗不擋主流程」的原則）。
+
+    用「台股加權指數(TAIEX)」日線 OHLC 近似微台指方向，見 futures_signals.py 開頭的誠實聲明。
+    """
+    try:
+        import requests
+
+        store = IndexDailyStore(data_dir)
+        session = requests.Session()
+
+        today_bar = store.load(as_of)
+        if today_bar is None:
+            try:
+                today_bar = _fetch_twse_index_ohlc(session, as_of)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("期貨模組：抓取台股加權指數當日OHLC失敗: %r", exc)
+                today_bar = None
+            if today_bar is not None:
+                store.save(as_of, today_bar)
+
+        if today_bar is None:
+            return {"available": False, "reason": "今日台股加權指數OHLC抓取失敗，本次不提供期貨訊號"}
+
+        history = store.load_recent(as_of, lookback_days=60)
+        if len(history) < FUTURES.min_history_days:
+            return {
+                "available": False,
+                "reason": f"大盤指數歷史資料尚不足（目前累積{len(history)}天，需要至少{FUTURES.min_history_days}天才能算均線/ATR）",
+            }
+
+        closes = np.array([h["close"] for h in history], dtype=float)
+        highs = np.array([h["high"] for h in history], dtype=float)
+        lows = np.array([h["low"] for h in history], dtype=float)
+
+        direction, reason = decide_direction(
+            closes,
+            windows=FUTURES.ma_windows,
+            breadth_pct=breadth_pct,
+            breadth_risk_off_threshold=SCORING.breadth_risk_off_threshold,
+        )
+        result = {
+            "available": True,
+            "direction": direction,
+            "direction_reason": reason,
+            "as_of_close": float(closes[-1]),
+        }
+        if direction == "neutral":
+            log.info("期貨模組：方向判斷為中性，不提供進出場價位（%s）", reason)
+            return result
+
+        ee = compute_futures_entry_exit(
+            direction=direction,
+            high_hist=highs,
+            low_hist=lows,
+            close_hist=closes,
+            atr_window=FUTURES.atr_window,
+            atr_multiple=FUTURES.atr_stop_multiple,
+            risk_reward=FUTURES.target_risk_reward,
+        )
+        position = build_futures_position(
+            direction=direction,
+            entry_reference=ee.entry_reference,
+            stop_price=ee.stop_price,
+            target_price=ee.target_price,
+        )
+        result.update({
+            "entry_reference": ee.entry_reference,
+            "stop_price": ee.stop_price,
+            "target_price": ee.target_price,
+            "caveat": ee.caveat,
+            "position": position,
+        })
+        log.info("期貨模組：方向=%s，進場參考=%.0f，止損=%.0f，停利=%.0f，口數=%s",
+                 direction, ee.entry_reference, ee.stop_price, ee.target_price,
+                 position.contracts if position else "無可行口數")
+        return result
+    except Exception as exc:  # noqa: BLE001
+        log.warning("期貨模組整體失敗，本次報告不含期貨區塊（不影響報告其他部分）: %r", exc)
+        return {"available": False, "reason": "期貨模組執行時發生未預期錯誤"}
 
 
 def _entry_exit_for(snapshot, candidates):
@@ -160,19 +250,12 @@ def main() -> int:
 
     market_return_by_window = {3: 0.0, 5: 0.0, 10: 0.0}  # 大盤加權指數的多天期報酬率，之後可另外接入取代0
     scores = compute_sector_scores(snapshot.ohlcv, market_return_by_window)
-    # 2026-09-03：sector 現在存的是 real_providers.SECTOR_CODE_NAME 解析出來的官方全名
-    # （例如「半導體業」），不再是族群代碼，這裡要對齊，不然這個修正條件永遠不會命中。
     scores = apply_macro_overlay(
         scores, snapshot.intl_snapshot, semiconductor_sectors={"半導體業", "通信網路業", "電子零組件業"}
     )
     strongest, weakest = rank_sectors(scores)
     log.info("族群強度排名完成，最強=%s，最弱=%s", strongest[0].sector, weakest[0].sector)
 
-    # 2026-09-24 新增：大盤廣度風控（參考真實策略 FinLab 台股動能策略的設計，見
-    # sector_strength.market_breadth 與 config.SCORING 裡新增的 breadth_* 參數）。
-    # 用「篩選前的全市場股票池」（snapshot.ohlcv，包含所有族群，不只是選進候選清單的股票）
-    # 算廣度，這樣才是真正的「大盤」訊號，而不是候選股自己的廣度（候選股本來就是篩出來的
-    # 強勢股，拿候選股算廣度沒有意義）。
     breadth_pct = market_breadth(snapshot.ohlcv, window=SCORING.breadth_trend_window)
     if breadth_pct == breadth_pct and breadth_pct < SCORING.breadth_risk_off_threshold:
         risk_scale = SCORING.breadth_risk_off_scale
@@ -195,9 +278,6 @@ def main() -> int:
         log.info("空方篩選 %s：候選 %d 檔，排除 %d 檔", s.sector, len(cands), len(excluded))
         short_candidates.extend(cands[:3])
 
-    # 回測晉升門檻的真正串接（用 state/rule_registry.json 的歷史紀錄）留待累積夠多真實交易日資料後再接，
-    # 目前累積的歷史天數如果還不夠 backtest.py 的 min_sample_size，一律誠實標示 unvalidated，
-    # 不假裝已經驗證過。
     gate_results = {
         c.stock_id: GateResult(passed=False, confidence_tier="unvalidated", reasons=["尚在累積真實歷史資料，未達回測驗證門檻"])
         for c in long_candidates + short_candidates
@@ -205,9 +285,6 @@ def main() -> int:
 
     all_candidates_sorted = sorted(long_candidates + short_candidates, key=lambda c: c.score, reverse=True)
 
-    # 2026-09-24：entry/stop/target 要先算出來，才能交給 build_all_combos 的風險%部位法
-    # （第4種組合）用止損距離反推張數；原本 combos 是在算 entry_exit 之前就算好的，
-    # 這裡把順序換過來，行為對原本三種組合完全沒有影響（它們不吃 entry_exit_map）。
     long_ee = _entry_exit_for(snapshot, long_candidates)
     short_ee = _entry_exit_for(snapshot, short_candidates)
     all_ee = {**long_ee, **short_ee}
@@ -218,11 +295,12 @@ def main() -> int:
         entry_exit_map=all_ee,
     )
 
-    # 自動回測（2026-09-03 使用者要求：「請妳回測」「以後都要自動回測」）：先比對上一個交易日
-    # 的候選股有沒有真的觸價，再把「今天」的候選股存下來給明天用——順序不能顛倒，不然今天會
-    # 拿自己比對自己。
     backtest_review, backtest_summary = _run_backtest_review(as_of, DATA_DIR, log)
     bt.save_candidates(DATA_DIR, as_of, long_candidates + short_candidates, all_ee)
+
+    # 2026-09-24 新增：微台指(MXF)當沖建議（獨立於股票模組，見 _run_futures_section 的
+    # try/except 保護，失敗不影響股票報告本身）。
+    futures_result = _run_futures_section(as_of, DATA_DIR, log, breadth_pct)
 
     issues = self_check(snapshot) + endpoint_issues
     report_md = render_daily_report(
@@ -243,6 +321,7 @@ def main() -> int:
         breadth_window=SCORING.breadth_trend_window,
         breadth_threshold=SCORING.breadth_risk_off_threshold,
         breadth_risk_scale=risk_scale,
+        futures_result=futures_result,
     )
 
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -257,6 +336,14 @@ def main() -> int:
         "issues": issues,
         "breadth_pct": breadth_pct if breadth_pct == breadth_pct else None,
         "breadth_risk_scale": risk_scale,
+        "futures": {
+            "available": futures_result.get("available", False),
+            "direction": futures_result.get("direction"),
+            "entry": futures_result.get("entry_reference"),
+            "stop": futures_result.get("stop_price"),
+            "target": futures_result.get("target_price"),
+            "contracts": futures_result["position"].contracts if futures_result.get("position") else None,
+        },
         "long_candidates": [
             {
                 "stock_id": c.stock_id,
