@@ -1,0 +1,47 @@
+name: 回補台股加權指數歷史(供微台指模組使用)
+
+on:
+  workflow_dispatch: {} # 手動觸發的一次性 workflow，跟 backfill-history.yml 同一種模式
+
+permissions:
+  contents: write # 需要 push 回補的指數歷史資料回 repo
+
+jobs:
+  backfill-index-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pandas numpy pytest
+
+      - name: Run unit tests（跑測試，測試沒過就不回補）
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          pytest tests/ -q
+
+      - name: 回補台股加權指數歷史OHLC
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          python scripts/backfill_index_history.py
+
+      - name: Commit 並 push 回補的指數歷史資料
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/index_daily/
+          if git diff --cached --quiet; then
+            echo "沒有新的變更（可能已經回補過），不建立空 commit"
+          else
+            git commit -m "chore: 回補台股加權指數歷史OHLC(供微台指模組使用)"
+            git pull --rebase
+            git push
+          fi
