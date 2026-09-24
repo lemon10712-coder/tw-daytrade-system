@@ -1,12 +1,25 @@
 """微台指模組的資料層：抓取並逐日累積台股加權指數(TAIEX)的日線 OHLC。
 
-**跟 real_providers.py 開頭聲明同樣的可信度警語**：這個雲端沙盒本身連不到 TWSE 的端點
-（見 KNOWN_ISSUES.md），下面 `_fetch_twse_index_ohlc` 用的端點路徑與欄位名稱是根據 TWSE
-公開資料慣例寫的，**沒有機會在這個環境裡對著真實回應驗證過**。用跟 real_providers.py 一致
-的防禦性寫法：欄位比對用關鍵字、找不到就丟出清楚的 DataValidationError、把實際欄位列出來，
-刻意設計成第一次在 GitHub Actions 真正執行時，如果格式不對會清楚失敗並告訴你差在哪裡，
-而不是悄悄用錯的欄位算出一個看起來正常但其實是錯的結果——這個模組是全新的，比 real_providers.py
-其他端點多一層不確定性，第一次真實執行後務必核對 Actions 執行紀錄。
+**2026-09-24 第一次在 GitHub Actions 真實執行後已修正（原本的端點猜測是錯的）**：
+最初猜測的 `www.twse.com.tw/rwd/zh/afterTrading/MI_5MINS_HIST?date=YYYYMMDD` 整個路徑是錯的
+（回應 404 頁面，導致 JSONDecodeError），透過瀏覽器打開 TWSE 官網「發行量加權股價指數歷史資料」
+頁面（https://www.twse.com.tw/zh/indices/taiex/mi-5min-hist.html）並攔截它實際呼叫的 API，
+找到真正的端點：`www.twse.com.tw/rwd/zh/TAIEX/MI_5MINS_HIST?date=YYYYMMDD&response=json`
+（差別：路徑是 `TAIEX/`，不是 `afterTrading/`）。已對照真實回應驗證過，行為如下：
+- `date` 參數用西元年 `YYYYMMDD`（月份/日期哪一天不重要，只要落在目標月份內即可），
+  **回傳的是「整個月」的資料**，不是單日一筆——例如 `date=20260801` 會回傳 115年08月
+  全部交易日的資料，`title` 欄位會是「115年08月 發行量加權股價指數歷史資料」。
+- 回應格式：`{"stat":"OK","title":"...","date":"...","fields":["日期","開盤指數","最高指數",
+  "最低指數","收盤指數"],"data":[["115/08/03","42,780.42","43,784.19","42,780.42","43,386.41"],
+  ...],"total":...}`，`日期` 欄位是**民國年**格式（`115/08/03`），數字欄位帶千分位逗號
+  （例如 `"42,780.42"`），這裡的 `_to_float` 已經會處理逗號。
+- 呼叫端要自己從整個月的 `data` 陣列裡，用民國年格式比對出目標日期那一列，不能只取最後一列
+  （最後一列是「這個月目前為止最新一天」，不是「呼叫時要的那一天」，兩者只有在查當月最新
+  交易日時才會一樣）。
+
+跟 real_providers.py 開頭聲明同樣的可信度原則：欄位比對用關鍵字、找不到就丟出清楚的
+DataValidationError、把實際欄位列出來，避免之後這個端點格式又變動時悄悄用錯的欄位算出
+看起來正常但其實是錯的結果。
 
 設計上刻意跟股票系統的 `DailySnapshotStore` 分開存放（`data/index_daily/` 而不是塞進
 `data/daily/`），因為兩者的資料形狀完全不同（一個是全市場千檔股票，一個是單一指數的
@@ -53,21 +66,25 @@ def _to_float(value) -> float:
         return float("nan")
 
 
+def _roc_date_str(as_of: dt.date) -> str:
+    """西元年日期轉成 TWSE 這個端點用的民國年字串，例如 2026-08-03 -> "115/08/03"。"""
+    return f"{as_of.year - 1911}/{as_of.month:02d}/{as_of.day:02d}"
+
+
 def _fetch_twse_index_ohlc(session, as_of: dt.date) -> dict | None:
     """抓「指定某一天」台股加權指數(TAIEX)的日線 OHLC。
 
-    用的是 TWSE 舊版「盤後資訊」系統的加權指數歷史行情端點（MI_5MINS_HIST，跟
-    real_providers.py 的 MI_INDEX 屬於同一套舊系統，日期查詢方式相同）。預期格式是
-    `{"stat": "OK", "fields": [...], "data": [[日期, 開盤指數, 最高指數, 最低指數, 收盤指數], ...]}`，
-    一天一筆。如果實際格式不同，會在 GitHub Actions 第一次真實執行時由下面的防禦性解析
-    清楚報錯（見檔案開頭聲明）。
+    用的是 TWSE 官網「發行量加權股價指數歷史資料」頁面實際呼叫的端點：
+    `www.twse.com.tw/rwd/zh/TAIEX/MI_5MINS_HIST?date=YYYYMMDD&response=json`
+    （2026-09-24 已對照真實回應驗證過，見檔案開頭聲明）。這個端點一次回傳「整個月」的
+    資料，不是單日一筆，所以這裡要從回傳的月資料裡，用民國年格式比對出目標日期那一列。
 
-    非交易日/假日會回傳 stat 不是 "OK"，這種情況回傳 None（呼叫端當成「今天沒有資料」處理，
-    不是錯誤）。
+    非交易日/假日、或該月資料裡找不到目標日期那一列，回傳 None（呼叫端當成「這天沒有
+    資料」處理，不是錯誤——例如週末、國定假日本來就不會有交易資料）。
     """
     date_str = as_of.strftime("%Y%m%d")
     resp = session.get(
-        f"{TWSE_LEGACY_BASE}/afterTrading/MI_5MINS_HIST?date={date_str}&response=json",
+        f"{TWSE_LEGACY_BASE}/TAIEX/MI_5MINS_HIST?date={date_str}&response=json",
         timeout=30,
         headers={"Accept": "application/json", "User-Agent": _BROWSER_USER_AGENT},
     )
@@ -76,19 +93,36 @@ def _fetch_twse_index_ohlc(session, as_of: dt.date) -> dict | None:
 
     stat = raw.get("stat") if isinstance(raw, dict) else None
     if stat is not None and stat != "OK":
-        logger.info("台股加權指數日線(MI_5MINS_HIST, %s) 今天沒有資料（可能是非交易日）: stat=%r", date_str, stat)
+        logger.info("台股加權指數日線(TAIEX/MI_5MINS_HIST, %s) 這個月沒有資料（可能是非交易日/假日）: stat=%r", date_str, stat)
         return None
 
     fields = raw.get("fields") or []
     data_rows = raw.get("data") or []
     if not fields or not data_rows:
         raise DataValidationError(
-            f"台股加權指數日線(MI_5MINS_HIST, {date_str}) 回應裡沒有 fields/data，"
+            f"台股加權指數日線(TAIEX/MI_5MINS_HIST, {date_str}) 回應裡沒有 fields/data，"
             f"實際回應的 top-level key 有：{sorted(raw.keys()) if isinstance(raw, dict) else type(raw)}。"
-            "格式可能跟這裡假設的不一樣，需要對照這次錯誤訊息更新 _fetch_twse_index_ohlc。"
+            "格式可能又變了，需要對照這次錯誤訊息更新 _fetch_twse_index_ohlc。"
         )
-    # 通常只有當天這一筆，取最後一筆保險（避免端點意外回傳多天）
-    row = dict(zip(fields, data_rows[-1]))
+
+    target = _roc_date_str(as_of)
+    date_field_idx = None
+    for i, f in enumerate(fields):
+        if "日期" in f:
+            date_field_idx = i
+            break
+    if date_field_idx is None:
+        raise DataValidationError(
+            f"台股加權指數日線(TAIEX/MI_5MINS_HIST, {date_str}) 回應的 fields 裡找不到「日期」欄位，"
+            f"實際 fields 有：{fields}。"
+        )
+
+    matched_row = next((r for r in data_rows if len(r) > date_field_idx and r[date_field_idx] == target), None)
+    if matched_row is None:
+        logger.info("台股加權指數日線(TAIEX/MI_5MINS_HIST)：%s（民國 %s）不在這個月的資料裡（可能是非交易日）", as_of, target)
+        return None
+
+    row = dict(zip(fields, matched_row))
     open_key = _find_key(row, "開盤")
     high_key = _find_key(row, "最高")
     low_key = _find_key(row, "最低")
