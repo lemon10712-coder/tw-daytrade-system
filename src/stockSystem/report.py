@@ -93,6 +93,54 @@ def format_breadth_summary(
     return line
 
 
+def render_futures_section(futures_result: dict | None) -> list[str]:
+    """2026-09-24 新增：微台指(MXF)當沖建議區塊（見 futures_signals.py／futures_position_sizing.py）。
+
+    跟系統其餘部分同一套誠實原則：資料不足、訊號中性、或算不出可行口數時，清楚說明原因，
+    不假裝有訊號、不硬湊一個看起來能操作的建議。這個區塊用的是「台股加權指數」日線近似
+    微台指方向，不是微台指本身的逐筆報價，caveat 文字會明確講這個限制（見 futures_signals.FUTURES_CAVEAT）。
+    """
+    lines = ["## 7. 微台指(MXF)當沖建議"]
+    if not futures_result or not futures_result.get("available"):
+        reason = (futures_result or {}).get("reason") or "本次無法計算期貨訊號"
+        lines.append(f"（{reason}）")
+        lines.append("")
+        return lines
+
+    direction = futures_result.get("direction", "neutral")
+    direction_label = {"long": "偏多", "short": "偏空", "neutral": "中性"}.get(direction, direction)
+    as_of_close = futures_result.get("as_of_close")
+    if as_of_close is not None:
+        lines.append(f"加權指數參考收盤：{as_of_close:.0f}")
+    lines.append(f"方向判斷：{direction_label}——{futures_result.get('direction_reason', '')}")
+
+    if direction == "neutral":
+        lines.append("（中性不建議進場，本次不提供進出場價位）")
+        lines.append("")
+        return lines
+
+    lines.append(
+        f"進場參考：{futures_result['entry_reference']:.0f}"
+        f"　止損參考：{futures_result['stop_price']:.0f}"
+        f"　停利參考：{futures_result['target_price']:.0f}"
+    )
+    caveat = futures_result.get("caveat")
+    if caveat:
+        lines.append(f"> ＊{caveat}")
+
+    position = futures_result.get("position")
+    if position is None:
+        lines.append("（本次資金/風險條件下算不出可行口數，僅供方向觀察，不建議進場）")
+    else:
+        lines.append(
+            f"建議口數：{position.contracts} 口（{position.contract_code}），"
+            f"保證金用掉約 {position.margin_used_twd:,.0f} 元／剩餘 {position.margin_remaining_twd:,.0f} 元，"
+            f"若觸及止損參考價最大預計虧損約 {position.max_loss_twd:,.0f} 元（未計手續費交易稅）"
+        )
+    lines.append("")
+    return lines
+
+
 def render_daily_report(
     as_of: dt.date,
     snapshot: MarketSnapshot,
@@ -100,24 +148,25 @@ def render_daily_report(
     weakest_sectors: list,
     long_candidates: list,
     short_candidates: list,
-    gate_results: dict,          # {candidate.stock_id: GateResult}
+    gate_results: dict,  # {candidate.stock_id: GateResult}
     combos: list,
     issues: list,
-    long_entry_exit: dict | None = None,   # {stock_id: EntryExitPlan}
+    long_entry_exit: dict | None = None,  # {stock_id: EntryExitPlan}
     short_entry_exit: dict | None = None,
-    backtest_review: list | None = None,   # [backtest_tracker.BacktestOutcome, ...]，上一交易日候選股的真實結果
+    backtest_review: list | None = None,  # [backtest_tracker.BacktestOutcome, ...]，上一交易日候選股的真實結果
     backtest_summary: dict | None = None,  # backtest_tracker.append_summary() 回傳的累積統計
-    breadth_pct: float | None = None,      # sector_strength.market_breadth() 的結果，見 format_breadth_summary
+    breadth_pct: float | None = None,  # sector_strength.market_breadth() 的結果，見 format_breadth_summary
     breadth_window: int = 60,
     breadth_threshold: float = 0.40,
     breadth_risk_scale: float = 1.0,
+    futures_result: dict | None = None,  # 2026-09-24 新增，見 render_futures_section
 ) -> str:
     lines = []
     is_test = snapshot.is_synthetic()
 
     title = "【測試模式｜非真實市場資料】台股當沖每日報告" if is_test else "台股當沖每日報告"
     lines.append(f"# {title}")
-    lines.append(f"資料日期: {as_of.isoformat()}　資料來源標記: {snapshot.source_tag.value}")
+    lines.append(f"資料日期: {as_of.isoformat()} 資料來源標記: {snapshot.source_tag.value}")
     lines.append("")
 
     if issues:
@@ -140,9 +189,9 @@ def render_daily_report(
         for o in backtest_review:
             direction_label = "多方" if o.direction == "long" else "空方"
             touched_label = "✅ 有觸及" if o.entry_touched else "❌ 未觸及"
-            lines.append(f"- {o.stock_id}　{o.name}（{direction_label}）：進場參考 {o.entry_reference:.2f}，"
-                          f"{touched_label}（實際開{o.actual_open:.2f}／高{o.actual_high:.2f}／"
-                          f"低{o.actual_low:.2f}／收{o.actual_close:.2f}）——{o.result}")
+            lines.append(f"- {o.stock_id} {o.name}（{direction_label}）：進場參考 {o.entry_reference:.2f}，"
+                         f"{touched_label}（實際開{o.actual_open:.2f}／高{o.actual_high:.2f}／"
+                         f"低{o.actual_low:.2f}／收{o.actual_close:.2f}）——{o.result}")
         lines.append("")
         if backtest_summary and backtest_summary.get("cumulative", {}).get("sample_trading_days"):
             cum = backtest_summary["cumulative"]
@@ -182,11 +231,6 @@ def render_daily_report(
             lines.append("（今日無符合條件的候選股）")
             lines.append("")
             return
-        # 進出場的資料限制警語（日線近似VWAP、無法用日資料算開盤區間等）每一檔都完全一樣，
-        # 不是個股專屬的分析——之前每一檔候選股下面都完整重複這段警語，使用者反映看起來
-        # 像是「每一檔的推薦理由都是這段罐頭文字」。改成只在本節開頭講一次，個股底下的
-        # 進出場數字只留一個簡短的星號註記指回這裡，個股專屬的分析改看「見解」那一行
-        # （見 stock_screener._narrate）。
         sample_ee = next((entry_exit_map.get(c.stock_id) for c in candidates if entry_exit_map.get(c.stock_id)), None)
         if sample_ee:
             lines.append(f"> ＊進出場價位的共同限制說明：{sample_ee.caveat}")
@@ -200,8 +244,8 @@ def render_daily_report(
                 "medium": "中信心",
                 "high": "高信心",
             }.get(tier, tier)
-            lines.append(f"### {c.stock_id}　{c.name}（{c.sector}，信心：{tier_label}）")
-            lines.append(f"- 參考價: {c.price:.2f}　分數: {c.score}")
+            lines.append(f"### {c.stock_id} {c.name}（{c.sector}，信心：{tier_label}）")
+            lines.append(f"- 參考價: {c.price:.2f} 分數: {c.score}")
             lines.append(f"- 見解: {c.narrative}")
             lines.append(f"- 依據標籤: {'; '.join(c.reasons)}")
             if gate:
@@ -225,7 +269,7 @@ def render_daily_report(
         lines.append("（無可行組合，可能是候選股皆超出你的額度或無合格候選股）")
     all_ee = {**(long_entry_exit or {}), **(short_entry_exit or {})}
     for combo in combos:
-        lines.append(f"### {combo.label}　使用 {combo.total_cost:,.0f} 元／剩餘 {combo.remaining:,.0f} 元")
+        lines.append(f"### {combo.label} 使用 {combo.total_cost:,.0f} 元／剩餘 {combo.remaining:,.0f} 元")
         for line in combo.lines:
             loss_str = ""
             ee = all_ee.get(line.stock_id)
@@ -237,7 +281,9 @@ def render_daily_report(
             )
     lines.append("")
 
-    lines.append("## 7. 名詞小教室")
+    lines.extend(render_futures_section(futures_result))
+
+    lines.append("## 8. 名詞小教室")
     lines.append("見專案文件《台股當沖選股系統_規劃書》附錄名詞小辭典。")
 
     return "\n".join(lines)

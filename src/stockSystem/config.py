@@ -1,5 +1,4 @@
 """系統設定常數。
-
 所有「會影響金額計算、風險判斷」的關鍵數字都集中在這裡，並附上出處，
 方便之後使用者確認實際數字（例如元大手續費折扣）後直接回來改這一個檔案，
 不需要滿專案找散落的魔術數字（呼應使用者要求的「可追溯」）。
@@ -29,17 +28,16 @@ class AccountConfig:
 class MarketConfig:
     """市場層級的稅費常數 —— 均有公開資料佐證，見規劃書第 11 節。"""
 
-    fee_rate: float = 0.001425          # 證券商手續費牌告費率
-    fee_min_twd: float = 20.0           # 手續費下限（不足 20 元以 20 元計收）
-    tax_rate_daytrade: float = 0.0015   # 現股當沖證交稅（優惠稅率，延長至 2027-12-31）
-    tax_rate_normal: float = 0.003      # 一般證交稅（賣出時課徵）
+    fee_rate: float = 0.001425  # 證券商手續費牌告費率
+    fee_min_twd: float = 20.0  # 手續費下限（不足 20 元以 20 元計收）
+    tax_rate_daytrade: float = 0.0015  # 現股當沖證交稅（優惠稅率，延長至 2027-12-31）
+    tax_rate_normal: float = 0.003  # 一般證交稅（賣出時課徵）
     daytrade_tax_sunset: str = "2027-12-31"
 
 
 @dataclass(frozen=True)
 class ValidationConfig:
     """回測驗證閘門的門檻 —— 對應規劃書第 8 節「晉升門檻」。
-
     這些是初始建議值，之後應該用實際回測結果去校準，不是憑感覺定的終版數字，
     所以每個欄位都附上「為什麼先這樣設」的說明。
     """
@@ -51,8 +49,8 @@ class ValidationConfig:
     # 期望值（扣成本後）門檻：必須為正，且要求一個最小值避免「勉強打平」的規則被視為有效
     min_expectancy_pct: float = 0.001
     # walk-forward 切分：訓練期與測試期的天數（先給一組合理預設，之後可調）
-    train_window_days: int = 126   # 約半年交易日
-    test_window_days: int = 63     # 約一季交易日
+    train_window_days: int = 126  # 約半年交易日
+    test_window_days: int = 63  # 約一季交易日
     # 實測績效與回測預期的偏離超過這個標準差倍數，觸發降級警示
     live_drift_std_threshold: float = 2.0
 
@@ -84,13 +82,12 @@ class ScoringConfig:
     # breadth_trend_window 沿用 ma_windows 裡本來就有的第4個窗口(60)，不是另外發明新窗口。
     breadth_trend_window: int = 60
     breadth_risk_off_threshold: float = 0.40  # 廣度低於這個比例視為「大盤環境偏空」
-    breadth_risk_off_scale: float = 0.5       # 觸發風控時，部位規模（額度上限）乘上這個係數
+    breadth_risk_off_scale: float = 0.5  # 觸發風控時，部位規模（額度上限）乘上這個係數
 
 
 @dataclass(frozen=True)
 class RiskSizingConfig:
     """風險百分比部位法的參數（見 position_sizing.build_risk_based）。
-
     2026-09-24 新增，方法論參考海龜交易系統（Turtle Trading System，Richard Dennis）
     真實文獻的核心設計：每一個 unit 的風險預算 = 帳戶規模的固定百分比（原始設計為 1%），
     不是像「集中單押/核心＋衛星/分散配置」那樣先決定要花多少錢，而是先決定「萬一看錯、
@@ -99,7 +96,54 @@ class RiskSizingConfig:
     """
 
     risk_pct_per_trade: float = 0.01  # 每檔部位的風險預算 = capital_cap * 這個比例；1% 為海龜系統原始設計值
-    max_candidates: int = 3           # 最多分配到幾檔候選股，避免過度分散成太多小部位
+    max_candidates: int = 3  # 最多分配到幾檔候選股，避免過度分散成太多小部位
+
+
+@dataclass(frozen=True)
+class FuturesConfig:
+    """微型臺指期貨(MXF)當沖模組的合約規格與風控參數。
+
+    2026-09-24 新增：使用者要求把系統擴充到台指期貨當沖，選定從微台指(MXF)開始
+    （保證金門檻在三種台指期契約裡最低，適合先驗證邏輯、之後有需要再擴充到小台/大台）。
+    這裡的數字分兩種來源，刻意分開標註：
+    - 合約規格（每點價值、最小跳動點位）：期交所公開規格，變動機率低，查證日期 2026-09-24。
+    - 保證金金額：期交所會依大盤波動度不定期調整，不是永久不變的數字，這裡先用查證當下
+      的公開資訊當預設值，跟 AccountConfig.fee_discount 的處理原則一樣——先做出可調機制，
+      標明「尚未由使用者對照券商最新公告確認」，不假裝這個數字永遠準確。
+    - capital_cap_twd（期貨當沖資金額度）：刻意獨立於股票的 50 萬額度（ACCOUNT.capital_cap_twd），
+      因為期貨是保證金交易、風險結構跟現股完全不同，兩個額度混用同一個池子會讓風控失真。
+      這裡先給一個保守預設值，需要使用者確認實際要撥多少資金進期貨帳戶。
+    """
+
+    contract_code: str = "MXF"  # 微型臺指期貨
+    point_value_twd: float = 10.0  # 每點價值（新台幣元），期交所公開規格
+    tick_size_points: float = 1.0  # 最小跳動點位
+
+    # 原始保證金：TODO(使用者確認): 下單前務必跟期貨商核對最新保證金公告，
+    # 這個數字會隨大盤波動度變動，不是固定值。
+    original_margin_twd: float = 17_850.0
+    margin_confirmed: bool = False
+
+    # 期貨當沖資金額度：TODO(使用者確認): 這個額度應該由使用者決定實際要撥多少資金進期貨帳戶，
+    # 先給一個約可容納 5 口微台原始保證金量級的保守預設值。
+    capital_cap_twd: float = 100_000.0
+    capital_cap_confirmed: bool = False
+
+    # 交易時間（供報告文字說明用，非程式邏輯判斷依據）
+    day_session: str = "08:45-13:45"
+    night_session: str = "15:00-隔日05:00"
+
+    # 技術面參數：這裡是對「台股加權指數(TAIEX)」本身算均線/ATR，不是對微台指本身的報價算——
+    # 系統目前的資料層只有 TWSE 加權指數每日 OHLC 可靠取得，微台指跟加權指數之間存在期現貨
+    # 價差(basis)，用加權指數近似微台指方向，不是假裝兩者完全相同，報告會清楚註明這個限制
+    # （呼應 entry_exit.py 對個股「日線近似值、不保證精確」的同一套誠實原則）。
+    ma_windows: tuple = (5, 10, 20)
+    atr_window: int = 14
+    atr_stop_multiple: float = 1.2  # 跟 SCORING.atr_stop_multiple 用同一個預設值，一樣可調、一樣待累積真實樣本校準
+    target_risk_reward: float = 1.5  # 停利 = 止損距離 * 這個倍數（風險報酬比法，跟 entry_exit.py 精神一致）
+
+    risk_pct_per_trade: float = 0.01  # 每次進場的風險預算 = capital_cap_twd * 這個比例，跟 RiskSizingConfig 同一套精神
+    min_history_days: int = 20  # 少於這個天數的指數歷史，均線/ATR 一律標示「資料不足」，不硬算
 
 
 ACCOUNT = AccountConfig()
@@ -107,3 +151,4 @@ MARKET = MarketConfig()
 VALIDATION = ValidationConfig()
 SCORING = ScoringConfig()
 RISK_SIZING = RiskSizingConfig()
+FUTURES = FuturesConfig()
