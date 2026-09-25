@@ -3,6 +3,18 @@
   "tagline": "每日自動選股報告（含微台指(MXF)期貨模組）",
   "reports": [
     {
+      "date": "2026-09-25",
+      "url": "reports/2026-09-25.html",
+      "is_test": false,
+      "sentiment": "偏多",
+      "issues_count": 3,
+      "long_count": 9,
+      "short_count": 1,
+      "futures_available": false,
+      "futures_direction": null,
+      "futures_has_position": false
+    },
+    {
       "date": "2026-09-24",
       "url": "reports/2026-09-24.html",
       "is_test": false,

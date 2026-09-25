@@ -1,0 +1,102 @@
+[
+  {
+    "stock_id": "8150",
+    "name": "南茂",
+    "direction": "long",
+    "prev_close": 107.0,
+    "entry_reference": 110.33333333333333,
+    "stop_price": 107.1704761904762,
+    "target_price": 116.6590476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8028",
+    "name": "昇陽半導體",
+    "direction": "long",
+    "prev_close": 258.0,
+    "entry_reference": 264.8333333333333,
+    "stop_price": 258.3190476190476,
+    "target_price": 277.8619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3016",
+    "name": "嘉晶",
+    "direction": "long",
+    "prev_close": 145.5,
+    "entry_reference": 155.66666666666666,
+    "stop_price": 149.83809523809524,
+    "target_price": 167.3238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6204",
+    "name": "艾華",
+    "direction": "long",
+    "prev_close": 98.0,
+    "entry_reference": 104.26666666666667,
+    "stop_price": 99.44095238095238,
+    "target_price": 113.91809523809523,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3605",
+    "name": "宏致",
+    "direction": "long",
+    "prev_close": 180.0,
+    "entry_reference": 182.83333333333334,
+    "stop_price": 176.01904761904763,
+    "target_price": 196.46190476190478,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3624",
+    "name": "光頡",
+    "direction": "long",
+    "prev_close": 134.0,
+    "entry_reference": 138.83333333333334,
+    "stop_price": 133.51904761904763,
+    "target_price": 149.46190476190478,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "long",
+    "prev_close": 203.5,
+    "entry_reference": 200.83333333333334,
+    "stop_price": 192.04761904761907,
+    "target_price": 218.4047619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3702",
+    "name": "大聯大",
+    "direction": "long",
+    "prev_close": 114.0,
+    "entry_reference": 116.16666666666667,
+    "stop_price": 114.32380952380953,
+    "target_price": 119.85238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6227",
+    "name": "茂綸",
+    "direction": "long",
+    "prev_close": 134.5,
+    "entry_reference": 135.66666666666666,
+    "stop_price": 132.7952380952381,
+    "target_price": 141.4095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "short",
+    "prev_close": 111.5,
+    "entry_reference": 110.66666666666667,
+    "stop_price": 112.25238095238096,
+    "target_price": 107.4952380952381,
+    "atr_multiple": 1.2
+  }
+]
