@@ -1,0 +1,47 @@
+name: 盤中微台指即時監控
+
+# 2026-09-27 新增。跟 daily-report.yml（開盤前一次性產生每日選股報告）完全獨立、
+# 互不影響：這裡只負責盤中每5分鐘抓一次台股期貨(TX，微台指MXF的報價代理)的即時
+# 報價，算出開盤區間突破/Camarilla樞紐點的進出場範圍，寫回 data/futures_intraday/
+# 跟 docs/futures_live.html（GitHub Pages 會直接服務這個頁面）。
+#
+# 排程時間換算：台北時間(UTC+8)的日盤 08:45-13:45，換成 UTC 是 00:45-05:45。
+# 用 */5 讓 GitHub Actions 在這個區間內每5分鐘觸發一次（實際觸發時間可能因為
+# GitHub 平台負載延遲數分鐘，這是 GitHub Actions cron 已知的限制，不是這支
+# workflow 能控制的，已經在 futures_intraday.py 的 FUTURES_INTRADAY_CAVEAT
+# 裡誠實寫明）。只涵蓋週一到週五、只涵蓋日盤，夜盤(15:00-次日05:00)之後如果
+# 需要再另外加一組排程，這次先聚焦日盤這個使用者最需要的時段。
+on:
+  schedule:
+    - cron: "*/5 0-5 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安裝相依套件
+        run: pip install -r requirements.txt
+
+      - name: 抓即時報價並計算進出場範圍
+        run: python scripts/run_intraday_futures.py
+
+      - name: 提交更新（只有真的有變動才 commit，避免空 commit 洗版）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/futures_intraday docs/futures_live.html docs/data/futures_intraday_latest.json
+          if git diff --cached --quiet; then
+            echo "沒有變動，略過 commit"
+          else
+            git commit -m "chore: 盤中期貨監控自動更新 $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git push
+          fi
