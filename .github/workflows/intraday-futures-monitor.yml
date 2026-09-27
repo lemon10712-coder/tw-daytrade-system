@@ -16,6 +16,9 @@ on:
     - cron: "*/5 0-5 * * 1-5"
   workflow_dispatch: {}
 
+permissions:
+  contents: write # 需要 push 盤中快照與 futures_live.html 回 repo
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
@@ -43,5 +46,6 @@ jobs:
             echo "沒有變動，略過 commit"
           else
             git commit -m "chore: 盤中期貨監控自動更新 $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git pull --rebase
             git push
           fi
