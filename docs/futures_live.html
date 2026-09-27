@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>微台指盤中即時監控｜台股當沖選股系統</title>
+<meta name="description" content="微台指(MXF)盤中即時方向與進出場範圍參考，每5分鐘自動更新">
+<style>
+  :root {
+    --accent: #2a78d6; --accent-2: #7d5fd6;
+    --good: #0ca30c; --critical: #d03b3b; --warning: #eda100;
+    --page-plane: #f9f9f7; --surface: #fcfcfb; --border: #e4e2dd;
+    --text-primary: #1a1a19; --text-secondary: #55534d; --text-muted: #8a8780;
+    --good-bg: #e3f6e0; --critical-bg: #fbe7e5; --neutral-bg: #eeece7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --accent: #3987e5; --accent-2: #a690f0;
+      --good: #26b354; --critical: #e66767; --warning: #c98500;
+      --page-plane: #0d0d0d; --surface: #1a1a19; --border: #2c2b27;
+      --text-primary: #f3f2ee; --text-secondary: #b7b4ac; --text-muted: #7a776f;
+      --good-bg: #16301c; --critical-bg: #3a1f1f; --neutral-bg: #26251f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--page-plane); color: var(--text-primary);
+    font-family: "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    padding: 20px 16px 40px; line-height: 1.6; max-width: 780px; margin: 0 auto;
+  }
+  .num { font-variant-numeric: tabular-nums; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .tagline { color: var(--text-secondary); font-size: 13px; margin: 0 0 4px; }
+  .updated { color: var(--text-muted); font-size: 12px; margin: 0 0 20px; }
+  .hero-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 10px; margin-bottom: 20px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .tile-label { font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
+  .tile-value { font-size: 22px; font-weight: 600; margin: 0; }
+  .tile-sub { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
+  .tone-good .tile-value { color: var(--good); }
+  .tone-critical .tile-value { color: var(--critical); }
+  .price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+  .price-row .price { font-size: 34px; font-weight: 700; }
+  .price-row .change.up { color: var(--good); }
+  .price-row .change.down { color: var(--critical); }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 20px; overflow-x: auto; }
+  svg.chart { display: block; min-width: 600px; }
+  svg.chart .line { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+  svg.chart .grid { stroke: var(--border); stroke-width: 1; }
+  svg.chart .axis-label { font-size: 9px; fill: var(--text-muted); font-family: monospace; }
+  .caveat { font-size: 12px; color: var(--text-muted); line-height: 1.8; padding: 14px; background: var(--neutral-bg); border-radius: 10px; }
+  .back { display:inline-block; margin-bottom: 16px; font-size: 13px; color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+  <a class="back" href="index.html">← 回部落格首頁</a>
+  <h1>微台指(MXF)盤中即時監控</h1>
+  <p class="tagline">臺股期貨(TX)分鐘報價代理 · 開盤區間突破 + Camarilla樞紐點 · GitHub Actions 盤中每5分鐘更新</p>
+  <p class="updated">資料日期 2026-09-27　更新時間 2026-09-27T11:45:11+08:00</p>
+
+  <div class="price-row">
+    <span class="price num">48,123</span>
+    <span class="change down num">-189</span>
+    <span style="color:var(--text-muted);font-size:13px;">臺股期貨(TX) 近月 · 成交量 65,343 口</span>
+  </div>
+
+  <div class="hero-grid">
+      <div class="tile tone-good">
+        <p class="tile-label">盤中方向偏向</p>
+        <p class="tile-value">偏多</p>
+        <p class="tile-sub">依 1345 最新價 48,096 判斷</p>
+      </div>
+      <div class="tile">
+        <p class="tile-label">進場價範圍</p>
+        <p class="tile-value num">47,925 ~ 48,096</p>
+      </div>
+      <div class="tile">
+        <p class="tile-label">停損價範圍</p>
+        <p class="tile-value num">47,825 ~ 47,910</p>
+      </div>
+      <div class="tile">
+        <p class="tile-label">停利價範圍</p>
+        <p class="tile-value num">48,124 ~ 48,224</p>
+      </div>
+  </div>
+
+  <div class="chart-card">
+    <svg class="chart" viewBox="0 0 640 160" role="img" aria-label="今日臺股期貨分鐘價格走勢"><line x1="44" y1="10.0" x2="630" y2="10.0" class="grid" /><text x="40" y="13.0" class="axis-label" text-anchor="end">48,262</text><line x1="44" y1="140.0" x2="630" y2="140.0" class="grid" /><text x="40" y="143.0" class="axis-label" text-anchor="end">47,797</text><polyline class="line" points="44.0,125.2 46.0,134.1 47.9,131.3 49.9,138.6 51.8,140.0 53.8,136.9 55.7,133.3 57.7,119.9 59.6,124.3 61.6,118.5 63.5,120.2 65.5,120.2 67.4,110.4 69.4,102.5 71.3,104.5 73.3,103.4 75.3,107.8 77.2,88.8 79.2,82.1 81.1,82.7 83.1,75.7 85.0,93.6 87.0,93.6 88.9,92.2 90.9,91.1 92.8,84.6 94.8,85.5 96.7,92.8 98.7,89.1 100.6,74.3 102.6,72.6 104.6,86.9 106.5,79.9 108.5,76.0 110.4,77.1 112.4,73.5 114.3,70.4 116.3,68.2 118.2,62.8 120.2,61.2 122.1,61.2 124.1,67.6 126.0,64.0 128.0,62.8 129.9,57.2 131.9,57.2 133.9,54.7 135.8,47.7 137.8,44.7 139.7,48.6 141.7,44.9 143.6,44.1 145.6,50.0 147.5,44.7 149.5,48.9 151.4,49.1 153.4,53.9 155.3,52.5 157.3,40.8 159.2,48.3 161.2,54.5 163.2,58.1 165.1,57.5 167.1,60.3 169.0,57.8 171.0,59.5 172.9,65.9 174.9,66.5 176.8,56.1 178.8,51.9 180.7,51.4 182.7,48.9 184.6,46.6 186.6,43.3 188.5,40.2 190.5,31.5 192.5,25.9 194.4,27.3 196.4,23.7 198.3,24.5 200.3,23.1 202.2,32.4 204.2,47.7 206.1,50.3 208.1,53.6 210.0,55.0 212.0,64.8 213.9,64.8 215.9,60.0 217.8,61.4 219.8,65.6 221.8,65.1 223.7,64.0 225.7,56.7 227.6,53.6 229.6,52.2 231.5,46.9 233.5,48.3 235.4,47.5 237.4,48.3 239.3,52.2 241.3,45.5 243.2,44.7 245.2,52.2 247.1,55.0 249.1,52.5 251.1,44.1 253.0,38.2 255.0,36.6 256.9,26.8 258.9,29.0 260.8,18.1 262.8,27.3 264.7,26.2 266.7,26.2 268.6,31.8 270.6,31.2 272.5,26.8 274.5,27.3 276.4,27.3 278.4,27.1 280.4,25.1 282.3,23.4 284.3,24.5 286.2,23.7 288.2,24.5 290.1,20.9 292.1,20.1 294.0,20.3 296.0,16.2 297.9,15.6 299.9,13.4 301.8,11.7 303.8,13.9 305.7,14.5 307.7,10.0 309.7,17.5 311.6,17.8 313.6,13.4 315.5,14.8 317.5,18.9 319.4,18.4 321.4,24.5 323.3,28.2 325.3,37.1 327.2,43.8 329.2,44.1 331.1,41.6 333.1,40.5 335.0,38.8 337.0,41.3 339.0,34.9 340.9,37.4 342.9,34.9 344.8,35.4 346.8,37.1 348.7,35.7 350.7,40.5 352.6,40.5 354.6,38.5 356.5,35.7 358.5,32.4 360.4,32.4 362.4,34.0 364.3,30.7 366.3,30.1 368.3,37.7 370.2,40.5 372.2,38.0 374.1,44.9 376.1,45.2 378.0,46.3 380.0,47.7 381.9,47.7 383.9,45.5 385.8,43.3 387.8,43.0 389.7,41.0 391.7,45.5 393.6,45.8 395.6,48.0 397.6,50.3 399.5,50.0 401.5,49.7 403.4,47.7 405.4,44.7 407.3,44.1 409.3,46.6 411.2,50.3 413.2,50.5 415.1,50.5 417.1,50.5 419.0,51.1 421.0,53.3 422.9,54.5 424.9,54.2 426.9,61.2 428.8,69.3 430.8,66.8 432.7,67.9 434.7,73.7 436.6,72.3 438.6,69.3 440.5,70.9 442.5,72.6 444.4,72.3 446.4,69.8 448.3,65.6 450.3,74.3 452.2,77.7 454.2,77.4 456.2,74.6 458.1,68.4 460.1,63.7 462.0,63.4 464.0,64.2 465.9,61.7 467.9,65.9 469.8,64.5 471.8,63.4 473.7,65.1 475.7,65.6 477.6,71.2 479.6,71.2 481.5,70.9 483.5,61.4 485.5,54.2 487.4,54.5 489.4,52.2 491.3,48.9 493.3,44.4 495.2,46.6 497.2,52.5 499.1,55.0 501.1,55.3 503.0,51.7 505.0,45.8 506.9,46.1 508.9,49.7 510.8,53.9 512.8,51.4 514.8,55.0 516.7,56.4 518.7,58.6 520.6,57.2 522.6,56.4 524.5,61.7 526.5,65.9 528.4,66.5 530.4,66.8 532.3,65.1 534.3,63.7 536.2,61.4 538.2,53.9 540.1,51.7 542.1,52.2 544.1,47.5 546.0,44.4 548.0,39.4 549.9,37.1 551.9,32.9 553.8,33.5 555.8,41.3 557.7,39.1 559.7,35.7 561.6,36.6 563.6,36.6 565.5,39.9 567.5,38.2 569.4,40.2 571.4,39.1 573.4,34.9 575.3,29.0 577.3,25.4 579.2,22.0 581.2,20.6 583.1,21.7 585.1,26.2 587.0,27.9 589.0,29.6 590.9,31.8 592.9,38.0 594.8,36.8 596.8,35.7 598.7,34.3 600.7,29.8 602.7,33.8 604.6,39.6 606.6,39.1 608.5,37.1 610.5,39.4 612.4,42.7 614.4,43.3 616.3,46.1 618.3,47.7 620.2,49.1 622.2,46.1 624.1,43.3 626.1,46.3 628.0,56.7 630.0,56.4" /><text x="44.0" y="156" class="axis-label" text-anchor="middle">0845</text><text x="141.7" y="156" class="axis-label" text-anchor="middle">0935</text><text x="239.3" y="156" class="axis-label" text-anchor="middle">1025</text><text x="337.0" y="156" class="axis-label" text-anchor="middle">1115</text><text x="434.7" y="156" class="axis-label" text-anchor="middle">1205</text><text x="532.3" y="156" class="axis-label" text-anchor="middle">1255</text><text x="630.0" y="156" class="axis-label" text-anchor="middle">1345</text></svg>
+  </div>
+
+  <p class="caveat">【重要】本區塊使用台灣期貨交易所官網公開、免登入的 quotesApi 端點(www.taifex.com.tw/cht/quotesApi/getQuotes)，資料是「臺股期貨(TX，大台)」每分鐘更新一次的參考價，不是逐筆(tick)成交明細，也不是微台指(MXF)自己的報價——TX 與 MXF 追蹤同一個台指期貨標的、同一組到期月份，報價點數在正常市況下幾乎完全一致(差別只在每點價值：TX每點新台幣200元、MXF每點10元)，這裡直接把 TX 的分鐘價格序列當作 MXF 方向與價位的代理，但不保證兩者在極端流動性情況下完全沒有微小價差(basis)。本區塊由 GitHub Actions 於盤中每 5 分鐘重新整理一次，不是持續不間斷的即時連線，兩次更新之間發生的價格變化不會被捕捉到；GitHub 排程本身也可能因平台負載而延遲數分鐘執行，不保證精確到秒。這個免費端點只給價格、沒有逐分鐘成交量，無法計算真正的成交量加權(VWAP)，這裡用時間加權(TWAP)代替。以下的進場/停損/停利「範圍」是用開盤區間突破(ORB)、Camarilla樞紐點、當日已實現波動度等公開技術分析方法計算出的參考區間，不是對台指期貨走勢的預測保證，也不構成投資建議，請自行判斷風險。</p>
+</body>
+</html>
