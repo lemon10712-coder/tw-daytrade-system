@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "8150",
+    "name": "南茂",
+    "direction": "long",
+    "prev_close": 112.0,
+    "entry_reference": 110.33333333333333,
+    "stop_price": 107.18761904761905,
+    "target_price": 116.62476190476188,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3016",
+    "name": "嘉晶",
+    "direction": "long",
+    "prev_close": 160.0,
+    "entry_reference": 155.66666666666666,
+    "stop_price": 149.88095238095238,
+    "target_price": 167.2380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3189",
+    "name": "景碩",
+    "direction": "long",
+    "prev_close": 962.0,
+    "entry_reference": 962.3333333333334,
+    "stop_price": 939.0190476190477,
+    "target_price": 1008.9619047619047,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "long",
+    "prev_close": 199.0,
+    "entry_reference": 200.83333333333334,
+    "stop_price": 193.2047619047619,
+    "target_price": 216.0904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3010",
+    "name": "華立",
+    "direction": "long",
+    "prev_close": 126.0,
+    "entry_reference": 125.33333333333333,
+    "stop_price": 124.39047619047619,
+    "target_price": 127.2190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3702",
+    "name": "大聯大",
+    "direction": "long",
+    "prev_close": 117.5,
+    "entry_reference": 116.16666666666667,
+    "stop_price": 114.36666666666667,
+    "target_price": 119.76666666666667,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "short",
+    "prev_close": 157.5,
+    "entry_reference": 157.66666666666666,
+    "stop_price": 158.86666666666665,
+    "target_price": 155.26666666666668,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "short",
+    "prev_close": 110.5,
+    "entry_reference": 110.66666666666667,
+    "stop_price": 112.12380952380953,
+    "target_price": 107.75238095238096,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "short",
+    "prev_close": 150.0,
+    "entry_reference": 151.0,
+    "stop_price": 153.14285714285714,
+    "target_price": 146.71428571428572,
+    "atr_multiple": 1.2
+  }
+]
