@@ -1,0 +1,62 @@
+[
+  {
+    "stock_id": "1727",
+    "name": "中華化",
+    "direction": "long",
+    "prev_close": 115.5,
+    "entry_reference": 114.83333333333333,
+    "stop_price": 111.30190476190475,
+    "target_price": 121.89619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4770",
+    "name": "上品",
+    "direction": "long",
+    "prev_close": 281.5,
+    "entry_reference": 286.1666666666667,
+    "stop_price": 276.65238095238095,
+    "target_price": 305.19523809523815,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4768",
+    "name": "晶呈科技",
+    "direction": "long",
+    "prev_close": 325.0,
+    "entry_reference": 346.0,
+    "stop_price": 337.5571428571429,
+    "target_price": 362.88571428571424,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2615",
+    "name": "萬海",
+    "direction": "short",
+    "prev_close": 115.5,
+    "entry_reference": 112.83333333333333,
+    "stop_price": 115.49047619047619,
+    "target_price": 107.51904761904761,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2645",
+    "name": "長榮航太",
+    "direction": "short",
+    "prev_close": 172.0,
+    "entry_reference": 172.5,
+    "stop_price": 173.65714285714284,
+    "target_price": 170.1857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6753",
+    "name": "龍德造船",
+    "direction": "short",
+    "prev_close": 132.5,
+    "entry_reference": 133.0,
+    "stop_price": 134.24285714285713,
+    "target_price": 130.51428571428573,
+    "atr_multiple": 1.2
+  }
+]
