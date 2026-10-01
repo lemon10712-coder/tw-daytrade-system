@@ -1,0 +1,72 @@
+[
+  {
+    "stock_id": "4768",
+    "name": "晶呈科技",
+    "direction": "long",
+    "prev_close": 357.5,
+    "entry_reference": 374.0,
+    "stop_price": 363.8857142857143,
+    "target_price": 394.2285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "long",
+    "prev_close": 271.0,
+    "entry_reference": 272.6666666666667,
+    "stop_price": 267.73809523809524,
+    "target_price": 282.5238095238096,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "long",
+    "prev_close": 167.5,
+    "entry_reference": 169.0,
+    "stop_price": 167.2,
+    "target_price": 172.60000000000002,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3563",
+    "name": "牧德",
+    "direction": "long",
+    "prev_close": 794.0,
+    "entry_reference": 805.3333333333334,
+    "stop_price": 787.0761904761905,
+    "target_price": 841.8476190476191,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3455",
+    "name": "由田",
+    "direction": "long",
+    "prev_close": 267.0,
+    "entry_reference": 268.8333333333333,
+    "stop_price": 261.6333333333333,
+    "target_price": 283.2333333333333,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5234",
+    "name": "達興材料",
+    "direction": "long",
+    "prev_close": 322.0,
+    "entry_reference": 315.3333333333333,
+    "stop_price": 308.947619047619,
+    "target_price": 328.1047619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "short",
+    "prev_close": 111.5,
+    "entry_reference": 111.5,
+    "stop_price": 112.82857142857142,
+    "target_price": 108.84285714285716,
+    "atr_multiple": 1.2
+  }
+]
