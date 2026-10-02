@@ -1,0 +1,132 @@
+[
+  {
+    "stock_id": "3004",
+    "name": "豐達科",
+    "direction": "long",
+    "prev_close": 119.0,
+    "entry_reference": 121.16666666666667,
+    "stop_price": 119.66666666666667,
+    "target_price": 124.16666666666667,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6533",
+    "name": "晶心科",
+    "direction": "long",
+    "prev_close": 333.5,
+    "entry_reference": 356.6666666666667,
+    "stop_price": 340.4666666666667,
+    "target_price": 389.06666666666666,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3592",
+    "name": "瑞鼎",
+    "direction": "long",
+    "prev_close": 237.5,
+    "entry_reference": 238.83333333333334,
+    "stop_price": 235.8761904761905,
+    "target_price": 244.74761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6532",
+    "name": "瑞耘",
+    "direction": "long",
+    "prev_close": 118.5,
+    "entry_reference": 121.66666666666667,
+    "stop_price": 117.80952380952381,
+    "target_price": 129.3809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6530",
+    "name": "創威",
+    "direction": "long",
+    "prev_close": 104.5,
+    "entry_reference": 102.33333333333333,
+    "stop_price": 99.63333333333333,
+    "target_price": 107.73333333333333,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6285",
+    "name": "啟碁",
+    "direction": "long",
+    "prev_close": 236.0,
+    "entry_reference": 235.0,
+    "stop_price": 231.57142857142858,
+    "target_price": 241.85714285714283,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3045",
+    "name": "台灣大",
+    "direction": "long",
+    "prev_close": 119.5,
+    "entry_reference": 121.16666666666667,
+    "stop_price": 120.13809523809525,
+    "target_price": 123.22380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "short",
+    "prev_close": 163.0,
+    "entry_reference": 158.5,
+    "stop_price": 160.47142857142856,
+    "target_price": 154.55714285714288,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "short",
+    "prev_close": 111.0,
+    "entry_reference": 110.5,
+    "stop_price": 111.87142857142857,
+    "target_price": 107.75714285714287,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "short",
+    "prev_close": 151.0,
+    "entry_reference": 149.83333333333334,
+    "stop_price": 151.8904761904762,
+    "target_price": 145.71904761904764,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6753",
+    "name": "龍德造船",
+    "direction": "short",
+    "prev_close": 133.5,
+    "entry_reference": 132.83333333333334,
+    "stop_price": 134.03333333333333,
+    "target_price": 130.43333333333337,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2603",
+    "name": "長榮",
+    "direction": "short",
+    "prev_close": 239.5,
+    "entry_reference": 237.5,
+    "stop_price": 239.85714285714286,
+    "target_price": 232.78571428571428,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2615",
+    "name": "萬海",
+    "direction": "short",
+    "prev_close": 114.0,
+    "entry_reference": 112.5,
+    "stop_price": 114.94285714285714,
+    "target_price": 107.61428571428573,
+    "atr_multiple": 1.2
+  }
+]
