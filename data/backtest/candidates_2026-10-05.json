@@ -1,0 +1,102 @@
+[
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "long",
+    "prev_close": 209.5,
+    "entry_reference": 223.16666666666666,
+    "stop_price": 216.99523809523808,
+    "target_price": 235.5095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "long",
+    "prev_close": 119.0,
+    "entry_reference": 121.16666666666667,
+    "stop_price": 119.92380952380952,
+    "target_price": 123.65238095238097,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1727",
+    "name": "中華化",
+    "direction": "long",
+    "prev_close": 112.0,
+    "entry_reference": 119.0,
+    "stop_price": 113.70285714285714,
+    "target_price": 129.59428571428572,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4958",
+    "name": "臻鼎-KY",
+    "direction": "long",
+    "prev_close": 510.0,
+    "entry_reference": 545.3333333333334,
+    "stop_price": 530.3761904761905,
+    "target_price": 575.2476190476192,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2492",
+    "name": "華新科",
+    "direction": "long",
+    "prev_close": 329.0,
+    "entry_reference": 350.6666666666667,
+    "stop_price": 340.03809523809525,
+    "target_price": 371.92380952380955,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3042",
+    "name": "晶技",
+    "direction": "long",
+    "prev_close": 218.5,
+    "entry_reference": 226.83333333333334,
+    "stop_price": 220.96190476190478,
+    "target_price": 238.57619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3004",
+    "name": "豐達科",
+    "direction": "long",
+    "prev_close": 121.0,
+    "entry_reference": 121.16666666666667,
+    "stop_price": 119.88095238095238,
+    "target_price": 123.73809523809526,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "short",
+    "prev_close": 150.5,
+    "entry_reference": 150.33333333333334,
+    "stop_price": 151.91904761904763,
+    "target_price": 147.16190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1736",
+    "name": "喬山",
+    "direction": "short",
+    "prev_close": 127.5,
+    "entry_reference": 124.66666666666667,
+    "stop_price": 126.50952380952381,
+    "target_price": 120.98095238095239,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6890",
+    "name": "來億-KY",
+    "direction": "short",
+    "prev_close": 148.5,
+    "entry_reference": 147.66666666666666,
+    "stop_price": 149.16666666666666,
+    "target_price": 144.66666666666666,
+    "atr_multiple": 1.2
+  }
+]
