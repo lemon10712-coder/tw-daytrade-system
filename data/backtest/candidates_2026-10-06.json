@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "6207",
+    "name": "雷科",
+    "direction": "long",
+    "prev_close": 148.0,
+    "entry_reference": 150.0,
+    "stop_price": 143.65714285714284,
+    "target_price": 162.6857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4958",
+    "name": "臻鼎-KY",
+    "direction": "long",
+    "prev_close": 561.0,
+    "entry_reference": 578.0,
+    "stop_price": 562.7857142857143,
+    "target_price": 608.4285714285713,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4912",
+    "name": "聯德控股-KY",
+    "direction": "long",
+    "prev_close": 106.0,
+    "entry_reference": 110.33333333333333,
+    "stop_price": 107.79619047619047,
+    "target_price": 115.40761904761904,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "long",
+    "prev_close": 230.0,
+    "entry_reference": 228.66666666666666,
+    "stop_price": 222.4095238095238,
+    "target_price": 241.1809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "long",
+    "prev_close": 281.5,
+    "entry_reference": 281.8333333333333,
+    "stop_price": 275.49047619047616,
+    "target_price": 294.5190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "long",
+    "prev_close": 170.5,
+    "entry_reference": 178.5,
+    "stop_price": 176.1,
+    "target_price": 183.3,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3592",
+    "name": "瑞鼎",
+    "direction": "long",
+    "prev_close": 239.0,
+    "entry_reference": 238.83333333333334,
+    "stop_price": 236.21904761904761,
+    "target_price": 244.0619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6435",
+    "name": "大中",
+    "direction": "long",
+    "prev_close": 277.0,
+    "entry_reference": 282.0,
+    "stop_price": 277.3285714285714,
+    "target_price": 291.34285714285716,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8086",
+    "name": "宏捷科",
+    "direction": "long",
+    "prev_close": 120.0,
+    "entry_reference": 127.16666666666667,
+    "stop_price": 124.38095238095238,
+    "target_price": 132.73809523809524,
+    "atr_multiple": 1.2
+  }
+]
