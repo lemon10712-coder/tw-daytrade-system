@@ -1,0 +1,122 @@
+[
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "long",
+    "prev_close": 121.0,
+    "entry_reference": 129.16666666666666,
+    "stop_price": 127.06666666666666,
+    "target_price": 133.36666666666665,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "long",
+    "prev_close": 224.0,
+    "entry_reference": 221.16666666666666,
+    "stop_price": 214.73809523809524,
+    "target_price": 234.0238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "long",
+    "prev_close": 180.5,
+    "entry_reference": 180.0,
+    "stop_price": 177.6,
+    "target_price": 184.8,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2313",
+    "name": "華通",
+    "direction": "long",
+    "prev_close": 248.5,
+    "entry_reference": 251.0,
+    "stop_price": 245.85714285714286,
+    "target_price": 261.2857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6449",
+    "name": "鈺邦",
+    "direction": "long",
+    "prev_close": 227.0,
+    "entry_reference": 238.66666666666666,
+    "stop_price": 233.0095238095238,
+    "target_price": 249.98095238095235,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6197",
+    "name": "佳必琪",
+    "direction": "long",
+    "prev_close": 345.0,
+    "entry_reference": 362.3333333333333,
+    "stop_price": 355.2190476190476,
+    "target_price": 376.5619047619047,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6285",
+    "name": "啟碁",
+    "direction": "long",
+    "prev_close": 249.5,
+    "entry_reference": 260.1666666666667,
+    "stop_price": 255.2809523809524,
+    "target_price": 269.93809523809523,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2345",
+    "name": "智邦",
+    "direction": "long",
+    "prev_close": 2075.0,
+    "entry_reference": 2063.3333333333335,
+    "stop_price": 2006.7619047619048,
+    "target_price": 2176.476190476191,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2412",
+    "name": "中華電",
+    "direction": "long",
+    "prev_close": 145.5,
+    "entry_reference": 145.0,
+    "stop_price": 144.22857142857143,
+    "target_price": 146.54285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "short",
+    "prev_close": 117.5,
+    "entry_reference": 118.0,
+    "stop_price": 120.4,
+    "target_price": 113.19999999999999,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "short",
+    "prev_close": 188.5,
+    "entry_reference": 188.66666666666666,
+    "stop_price": 189.73809523809524,
+    "target_price": 186.5238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1736",
+    "name": "喬山",
+    "direction": "short",
+    "prev_close": 124.0,
+    "entry_reference": 121.83333333333333,
+    "stop_price": 123.89047619047619,
+    "target_price": 117.7190476190476,
+    "atr_multiple": 1.2
+  }
+]
