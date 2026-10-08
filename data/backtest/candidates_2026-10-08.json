@@ -1,0 +1,132 @@
+[
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "long",
+    "prev_close": 220.0,
+    "entry_reference": 224.66666666666666,
+    "stop_price": 218.23809523809524,
+    "target_price": 237.5238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "long",
+    "prev_close": 133.0,
+    "entry_reference": 130.5,
+    "stop_price": 127.97142857142858,
+    "target_price": 135.55714285714285,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "long",
+    "prev_close": 182.0,
+    "entry_reference": 177.0,
+    "stop_price": 174.5142857142857,
+    "target_price": 181.9714285714286,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2492",
+    "name": "華新科",
+    "direction": "long",
+    "prev_close": 389.5,
+    "entry_reference": 414.6666666666667,
+    "stop_price": 400.352380952381,
+    "target_price": 443.29523809523806,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2313",
+    "name": "華通",
+    "direction": "long",
+    "prev_close": 252.0,
+    "entry_reference": 251.0,
+    "stop_price": 245.9,
+    "target_price": 261.2,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2375",
+    "name": "凱美",
+    "direction": "long",
+    "prev_close": 125.5,
+    "entry_reference": 130.0,
+    "stop_price": 128.54285714285714,
+    "target_price": 132.9142857142857,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "short",
+    "prev_close": 117.5,
+    "entry_reference": 114.0,
+    "stop_price": 116.27142857142857,
+    "target_price": 109.45714285714286,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "short",
+    "prev_close": 188.5,
+    "entry_reference": 189.33333333333334,
+    "stop_price": 190.31904761904764,
+    "target_price": 187.36190476190475,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6753",
+    "name": "龍德造船",
+    "direction": "short",
+    "prev_close": 131.0,
+    "entry_reference": 131.5,
+    "stop_price": 132.27142857142857,
+    "target_price": 129.95714285714286,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2603",
+    "name": "長榮",
+    "direction": "short",
+    "prev_close": 236.5,
+    "entry_reference": 234.0,
+    "stop_price": 236.22857142857143,
+    "target_price": 229.54285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2615",
+    "name": "萬海",
+    "direction": "short",
+    "prev_close": 111.5,
+    "entry_reference": 111.5,
+    "stop_price": 113.38571428571429,
+    "target_price": 107.72857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7765",
+    "name": "中華資安",
+    "direction": "short",
+    "prev_close": 230.5,
+    "entry_reference": 234.66666666666666,
+    "stop_price": 237.92380952380952,
+    "target_price": 228.15238095238092,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6902",
+    "name": "GOGOLOOK",
+    "direction": "short",
+    "prev_close": 143.0,
+    "entry_reference": 139.0,
+    "stop_price": 146.5857142857143,
+    "target_price": 123.82857142857142,
+    "atr_multiple": 1.2
+  }
+]
