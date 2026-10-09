@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-10-08",
-  "generated_at": "2026-10-08T06:09:37.843803+00:00",
+  "as_of": "2026-10-09",
+  "generated_at": "2026-10-09T06:15:16.709934+00:00",
   "is_synthetic": false,
   "issues": [
     "股價資料存在缺漏值",
@@ -10,132 +10,41 @@
   "breadth_pct": null,
   "breadth_risk_scale": 1.0,
   "futures": {
-    "available": true,
-    "direction": "long",
-    "entry": 49313.44,
-    "stop": 48455.339714285714,
-    "target": 50600.590428571435,
+    "available": false,
+    "direction": null,
+    "entry": null,
+    "stop": null,
+    "target": null,
     "contracts": null
   },
   "long_candidates": [
     {
-      "stock_id": "4722",
-      "name": "國精化",
+      "stock_id": "4772",
+      "name": "台特化",
       "sector": "化學工業",
       "score": 90.0,
-      "entry": 224.66666666666666,
-      "stop": 218.23809523809524,
-      "target": 237.5238095238095
+      "entry": 275.0,
+      "stop": 268.65714285714284,
+      "target": 287.6857142857143
     },
     {
-      "stock_id": "4755",
-      "name": "三福化",
+      "stock_id": "4768",
+      "name": "晶呈科技",
       "sector": "化學工業",
-      "score": 90.0,
-      "entry": 130.5,
-      "stop": 127.97142857142858,
-      "target": 135.55714285714285
+      "score": 68.0,
+      "entry": 364.8333333333333,
+      "stop": 353.3047619047619,
+      "target": 387.89047619047614
     },
     {
-      "stock_id": "1773",
-      "name": "勝一",
+      "stock_id": "3430",
+      "name": "奇鈦科",
       "sector": "化學工業",
-      "score": 84.0,
-      "entry": 177.0,
-      "stop": 174.5142857142857,
-      "target": 181.9714285714286
-    },
-    {
-      "stock_id": "2492",
-      "name": "華新科",
-      "sector": "電子零組件業",
-      "score": 98.2,
-      "entry": 414.6666666666667,
-      "stop": 400.352380952381,
-      "target": 443.29523809523806
-    },
-    {
-      "stock_id": "2313",
-      "name": "華通",
-      "sector": "電子零組件業",
-      "score": 90.0,
-      "entry": 251.0,
-      "stop": 245.9,
-      "target": 261.2
-    },
-    {
-      "stock_id": "2375",
-      "name": "凱美",
-      "sector": "電子零組件業",
-      "score": 90.0,
-      "entry": 130.0,
-      "stop": 128.54285714285714,
-      "target": 132.9142857142857
+      "score": 27.9,
+      "entry": 111.0,
+      "stop": 109.5,
+      "target": 114.0
     }
   ],
-  "short_candidates": [
-    {
-      "stock_id": "3029",
-      "name": "零壹",
-      "sector": "資訊服務業",
-      "score": 32.9,
-      "entry": 114.0,
-      "stop": 116.27142857142857,
-      "target": 109.45714285714286
-    },
-    {
-      "stock_id": "6214",
-      "name": "精誠",
-      "sector": "資訊服務業",
-      "score": 22.5,
-      "entry": 189.33333333333334,
-      "stop": 190.31904761904764,
-      "target": 187.36190476190475
-    },
-    {
-      "stock_id": "6753",
-      "name": "龍德造船",
-      "sector": "航運業",
-      "score": 65.9,
-      "entry": 131.5,
-      "stop": 132.27142857142857,
-      "target": 129.95714285714286
-    },
-    {
-      "stock_id": "2603",
-      "name": "長榮",
-      "sector": "航運業",
-      "score": 49.5,
-      "entry": 234.0,
-      "stop": 236.22857142857143,
-      "target": 229.54285714285714
-    },
-    {
-      "stock_id": "2615",
-      "name": "萬海",
-      "sector": "航運業",
-      "score": 33.7,
-      "entry": 111.5,
-      "stop": 113.38571428571429,
-      "target": 107.72857142857143
-    },
-    {
-      "stock_id": "7765",
-      "name": "中華資安",
-      "sector": "數位雲端",
-      "score": 43.4,
-      "entry": 234.66666666666666,
-      "stop": 237.92380952380952,
-      "target": 228.15238095238092
-    },
-    {
-      "stock_id": "6902",
-      "name": "GOGOLOOK",
-      "sector": "數位雲端",
-      "score": 16.1,
-      "entry": 139.0,
-      "stop": 146.5857142857143,
-      "target": 123.82857142857142
-    }
-  ]
+  "short_candidates": []
 }

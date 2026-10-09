@@ -1,0 +1,32 @@
+[
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "long",
+    "prev_close": 278.0,
+    "entry_reference": 275.0,
+    "stop_price": 268.65714285714284,
+    "target_price": 287.6857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4768",
+    "name": "晶呈科技",
+    "direction": "long",
+    "prev_close": 365.0,
+    "entry_reference": 364.8333333333333,
+    "stop_price": 353.3047619047619,
+    "target_price": 387.89047619047614,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3430",
+    "name": "奇鈦科",
+    "direction": "long",
+    "prev_close": 113.0,
+    "entry_reference": 111.0,
+    "stop_price": 109.5,
+    "target_price": 114.0,
+    "atr_multiple": 1.2
+  }
+]

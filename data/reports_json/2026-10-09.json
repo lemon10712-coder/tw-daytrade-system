@@ -1,0 +1,50 @@
+{
+  "as_of": "2026-10-09",
+  "generated_at": "2026-10-09T06:15:16.709934+00:00",
+  "is_synthetic": false,
+  "issues": [
+    "股價資料存在缺漏值",
+    "全額交割股清單目前尚未串接資料源，本次篩選未排除全額交割股，下單前請自行核對",
+    "先賣後買(放空)資格目前用「排除處置股/全額交割股後的剩餘股票」保守近似，未串接官方當沖資格清單，下單前請自行到券商系統核對"
+  ],
+  "breadth_pct": null,
+  "breadth_risk_scale": 1.0,
+  "futures": {
+    "available": false,
+    "direction": null,
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "contracts": null
+  },
+  "long_candidates": [
+    {
+      "stock_id": "4772",
+      "name": "台特化",
+      "sector": "化學工業",
+      "score": 90.0,
+      "entry": 275.0,
+      "stop": 268.65714285714284,
+      "target": 287.6857142857143
+    },
+    {
+      "stock_id": "4768",
+      "name": "晶呈科技",
+      "sector": "化學工業",
+      "score": 68.0,
+      "entry": 364.8333333333333,
+      "stop": 353.3047619047619,
+      "target": 387.89047619047614
+    },
+    {
+      "stock_id": "3430",
+      "name": "奇鈦科",
+      "sector": "化學工業",
+      "score": 27.9,
+      "entry": 111.0,
+      "stop": 109.5,
+      "target": 114.0
+    }
+  ],
+  "short_candidates": []
+}
