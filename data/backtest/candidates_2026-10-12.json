@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "long",
+    "prev_close": 127.0,
+    "entry_reference": 128.83333333333334,
+    "stop_price": 126.56190476190477,
+    "target_price": 133.3761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "long",
+    "prev_close": 274.5,
+    "entry_reference": 275.0,
+    "stop_price": 268.65714285714284,
+    "target_price": 287.6857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "long",
+    "prev_close": 175.5,
+    "entry_reference": 177.33333333333334,
+    "stop_price": 174.93333333333334,
+    "target_price": 182.13333333333335,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6515",
+    "name": "穎崴",
+    "direction": "short",
+    "prev_close": 5615.0,
+    "entry_reference": 5580.0,
+    "stop_price": 5769.428571428572,
+    "target_price": 5201.142857142857,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2303",
+    "name": "聯電",
+    "direction": "short",
+    "prev_close": 147.5,
+    "entry_reference": 148.0,
+    "stop_price": 150.87142857142857,
+    "target_price": 142.25714285714287,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8271",
+    "name": "宇瞻",
+    "direction": "short",
+    "prev_close": 199.5,
+    "entry_reference": 200.66666666666666,
+    "stop_price": 201.99523809523808,
+    "target_price": 198.0095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2382",
+    "name": "廣達",
+    "direction": "short",
+    "prev_close": 325.5,
+    "entry_reference": 325.0,
+    "stop_price": 327.4,
+    "target_price": 320.20000000000005,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6121",
+    "name": "新普",
+    "direction": "short",
+    "prev_close": 364.0,
+    "entry_reference": 366.5,
+    "stop_price": 370.35714285714283,
+    "target_price": 358.78571428571433,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5289",
+    "name": "宜鼎",
+    "direction": "short",
+    "prev_close": 1250.0,
+    "entry_reference": 1260.0,
+    "stop_price": 1273.2857142857142,
+    "target_price": 1233.4285714285716,
+    "atr_multiple": 1.2
+  }
+]
