@@ -1,0 +1,42 @@
+[
+  {
+    "stock_id": "1303",
+    "name": "南亞",
+    "direction": "long",
+    "prev_close": 310.0,
+    "entry_reference": 305.8333333333333,
+    "stop_price": 296.87619047619046,
+    "target_price": 323.747619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5274",
+    "name": "信驊",
+    "direction": "short",
+    "prev_close": 17485.0,
+    "entry_reference": 17570.0,
+    "stop_price": 18167.85714285714,
+    "target_price": 16374.285714285717,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2454",
+    "name": "聯發科",
+    "direction": "short",
+    "prev_close": 4690.0,
+    "entry_reference": 4610.0,
+    "stop_price": 4724.428571428572,
+    "target_price": 4381.142857142857,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8271",
+    "name": "宇瞻",
+    "direction": "short",
+    "prev_close": 199.5,
+    "entry_reference": 196.66666666666666,
+    "stop_price": 197.99523809523808,
+    "target_price": 194.0095238095238,
+    "atr_multiple": 1.2
+  }
+]
