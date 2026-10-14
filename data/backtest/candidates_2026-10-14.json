@@ -1,0 +1,132 @@
+[
+  {
+    "stock_id": "1303",
+    "name": "南亞",
+    "direction": "long",
+    "prev_close": 303.0,
+    "entry_reference": 311.0,
+    "stop_price": 301.01428571428573,
+    "target_price": 330.97142857142853,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 113.0,
+    "entry_reference": 113.66666666666667,
+    "stop_price": 112.55238095238096,
+    "target_price": 115.8952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 158.5,
+    "entry_reference": 159.16666666666666,
+    "stop_price": 157.45238095238093,
+    "target_price": 162.5952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 165.5,
+    "entry_reference": 166.16666666666666,
+    "stop_price": 164.1952380952381,
+    "target_price": 170.10952380952378,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2603",
+    "name": "長榮",
+    "direction": "long",
+    "prev_close": 255.5,
+    "entry_reference": 258.6666666666667,
+    "stop_price": 254.12380952380954,
+    "target_price": 267.752380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2615",
+    "name": "萬海",
+    "direction": "long",
+    "prev_close": 121.0,
+    "entry_reference": 120.66666666666667,
+    "stop_price": 118.52380952380953,
+    "target_price": 124.95238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2637",
+    "name": "慧洋-KY",
+    "direction": "long",
+    "prev_close": 102.0,
+    "entry_reference": 102.83333333333333,
+    "stop_price": 100.75047619047618,
+    "target_price": 106.99904761904763,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2337",
+    "name": "旺宏",
+    "direction": "short",
+    "prev_close": 115.5,
+    "entry_reference": 108.16666666666667,
+    "stop_price": 110.35238095238095,
+    "target_price": 103.7952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2408",
+    "name": "南亞科",
+    "direction": "short",
+    "prev_close": 527.0,
+    "entry_reference": 493.1666666666667,
+    "stop_price": 503.1952380952381,
+    "target_price": 473.10952380952386,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7749",
+    "name": "意騰-KY",
+    "direction": "short",
+    "prev_close": 354.0,
+    "entry_reference": 348.1666666666667,
+    "stop_price": 356.22380952380956,
+    "target_price": 332.05238095238093,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2059",
+    "name": "川湖",
+    "direction": "short",
+    "prev_close": 10580.0,
+    "entry_reference": 10188.333333333334,
+    "stop_price": 10648.619047619048,
+    "target_price": 9267.761904761906,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3376",
+    "name": "新日興",
+    "direction": "short",
+    "prev_close": 173.0,
+    "entry_reference": 170.66666666666666,
+    "stop_price": 172.46666666666667,
+    "target_price": 167.06666666666663,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2316",
+    "name": "楠梓電",
+    "direction": "short",
+    "prev_close": 172.5,
+    "entry_reference": 163.83333333333334,
+    "stop_price": 167.13333333333335,
+    "target_price": 157.23333333333332,
+    "atr_multiple": 1.2
+  }
+]
