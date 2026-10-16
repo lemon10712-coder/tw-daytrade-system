@@ -1,0 +1,132 @@
+[
+  {
+    "stock_id": "1303",
+    "name": "南亞",
+    "direction": "long",
+    "prev_close": 349.0,
+    "entry_reference": 322.5,
+    "stop_price": 307.8857142857143,
+    "target_price": 351.7285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 160.5,
+    "entry_reference": 159.0,
+    "stop_price": 157.4142857142857,
+    "target_price": 162.17142857142858,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 114.0,
+    "entry_reference": 113.5,
+    "stop_price": 112.38571428571429,
+    "target_price": 115.72857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 168.0,
+    "entry_reference": 171.66666666666666,
+    "stop_price": 169.3095238095238,
+    "target_price": 176.38095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2408",
+    "name": "南亞科",
+    "direction": "short",
+    "prev_close": 480.5,
+    "entry_reference": 443.0,
+    "stop_price": 456.15714285714284,
+    "target_price": 416.6857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2449",
+    "name": "京元電子",
+    "direction": "short",
+    "prev_close": 296.5,
+    "entry_reference": 273.0,
+    "stop_price": 279.25714285714287,
+    "target_price": 260.48571428571427,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2344",
+    "name": "華邦電",
+    "direction": "short",
+    "prev_close": 165.0,
+    "entry_reference": 155.66666666666666,
+    "stop_price": 159.8238095238095,
+    "target_price": 147.35238095238097,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2059",
+    "name": "川湖",
+    "direction": "short",
+    "prev_close": 10005.0,
+    "entry_reference": 9713.333333333334,
+    "stop_price": 10199.333333333334,
+    "target_price": 8741.333333333334,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6781",
+    "name": "AES-KY",
+    "direction": "short",
+    "prev_close": 993.0,
+    "entry_reference": 940.3333333333334,
+    "stop_price": 956.8761904761905,
+    "target_price": 907.2476190476192,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8039",
+    "name": "台虹",
+    "direction": "short",
+    "prev_close": 303.0,
+    "entry_reference": 297.8333333333333,
+    "stop_price": 311.8904761904762,
+    "target_price": 269.71904761904756,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2455",
+    "name": "全新",
+    "direction": "short",
+    "prev_close": 523.0,
+    "entry_reference": 490.8333333333333,
+    "stop_price": 512.3047619047619,
+    "target_price": 447.89047619047614,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6426",
+    "name": "統新",
+    "direction": "short",
+    "prev_close": 336.5,
+    "entry_reference": 325.0,
+    "stop_price": 336.1857142857143,
+    "target_price": 302.6285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6285",
+    "name": "啟碁",
+    "direction": "short",
+    "prev_close": 253.0,
+    "entry_reference": 243.66666666666666,
+    "stop_price": 250.09523809523807,
+    "target_price": 230.80952380952382,
+    "atr_multiple": 1.2
+  }
+]
