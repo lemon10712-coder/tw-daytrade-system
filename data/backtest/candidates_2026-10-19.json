@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 159.5,
+    "entry_reference": 161.33333333333334,
+    "stop_price": 159.57619047619048,
+    "target_price": 164.84761904761908,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 113.5,
+    "entry_reference": 115.66666666666667,
+    "stop_price": 114.33809523809525,
+    "target_price": 118.32380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 173.0,
+    "entry_reference": 170.83333333333334,
+    "stop_price": 168.21904761904761,
+    "target_price": 176.0619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2408",
+    "name": "南亞科",
+    "direction": "short",
+    "prev_close": 439.5,
+    "entry_reference": 450.6666666666667,
+    "stop_price": 464.50952380952384,
+    "target_price": 422.9809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2330",
+    "name": "台積電",
+    "direction": "short",
+    "prev_close": 2440.0,
+    "entry_reference": 2428.3333333333335,
+    "stop_price": 2453.6190476190477,
+    "target_price": 2377.761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5274",
+    "name": "信驊",
+    "direction": "short",
+    "prev_close": 17500.0,
+    "entry_reference": 16298.333333333334,
+    "stop_price": 16852.04761904762,
+    "target_price": 15190.904761904765,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6538",
+    "name": "倉和",
+    "direction": "short",
+    "prev_close": 325.0,
+    "entry_reference": 286.0,
+    "stop_price": 303.35714285714283,
+    "target_price": 251.28571428571433,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2308",
+    "name": "台達電",
+    "direction": "short",
+    "prev_close": 1630.0,
+    "entry_reference": 1643.3333333333333,
+    "stop_price": 1709.7619047619046,
+    "target_price": 1510.4761904761906,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3090",
+    "name": "日電貿",
+    "direction": "short",
+    "prev_close": 171.5,
+    "entry_reference": 171.66666666666666,
+    "stop_price": 176.33809523809524,
+    "target_price": 162.3238095238095,
+    "atr_multiple": 1.2
+  }
+]
