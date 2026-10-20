@@ -1,0 +1,122 @@
+[
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 161.5,
+    "entry_reference": 158.66666666666666,
+    "stop_price": 156.78095238095239,
+    "target_price": 162.4380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 116.0,
+    "entry_reference": 114.5,
+    "stop_price": 113.12857142857143,
+    "target_price": 117.24285714285713,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 170.0,
+    "entry_reference": 167.83333333333334,
+    "stop_price": 165.26190476190476,
+    "target_price": 172.9761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2337",
+    "name": "旺宏",
+    "direction": "short",
+    "prev_close": 107.0,
+    "entry_reference": 101.39999999999999,
+    "stop_price": 104.69999999999999,
+    "target_price": 94.8,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2344",
+    "name": "華邦電",
+    "direction": "short",
+    "prev_close": 161.5,
+    "entry_reference": 154.16666666666666,
+    "stop_price": 159.18095238095236,
+    "target_price": 144.13809523809525,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2408",
+    "name": "南亞科",
+    "direction": "short",
+    "prev_close": 447.5,
+    "entry_reference": 429.5,
+    "stop_price": 444.07142857142856,
+    "target_price": 400.3571428571429,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4770",
+    "name": "上品",
+    "direction": "short",
+    "prev_close": 271.5,
+    "entry_reference": 267.3333333333333,
+    "stop_price": 274.147619047619,
+    "target_price": 253.70476190476194,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "short",
+    "prev_close": 125.0,
+    "entry_reference": 121.83333333333333,
+    "stop_price": 125.51904761904761,
+    "target_price": 114.46190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4764",
+    "name": "雙鍵",
+    "direction": "short",
+    "prev_close": 180.5,
+    "entry_reference": 173.33333333333334,
+    "stop_price": 181.21904761904761,
+    "target_price": 157.5619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2360",
+    "name": "致茂",
+    "direction": "short",
+    "prev_close": 2000.0,
+    "entry_reference": 1998.3333333333333,
+    "stop_price": 2084.047619047619,
+    "target_price": 1826.9047619047622,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6830",
+    "name": "汎銓",
+    "direction": "short",
+    "prev_close": 486.5,
+    "entry_reference": 484.6666666666667,
+    "stop_price": 494.56666666666666,
+    "target_price": 464.86666666666673,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6139",
+    "name": "亞翔",
+    "direction": "short",
+    "prev_close": 677.0,
+    "entry_reference": 660.3333333333334,
+    "stop_price": 677.3904761904762,
+    "target_price": 626.2190476190477,
+    "atr_multiple": 1.2
+  }
+]
