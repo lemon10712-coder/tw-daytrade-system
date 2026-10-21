@@ -1,0 +1,82 @@
+[
+  {
+    "stock_id": "3004",
+    "name": "豐達科",
+    "direction": "long",
+    "prev_close": 121.5,
+    "entry_reference": 122.16666666666667,
+    "stop_price": 121.05238095238096,
+    "target_price": 124.3952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2912",
+    "name": "統一超",
+    "direction": "long",
+    "prev_close": 228.5,
+    "entry_reference": 226.83333333333334,
+    "stop_price": 224.81904761904764,
+    "target_price": 230.86190476190475,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2303",
+    "name": "聯電",
+    "direction": "short",
+    "prev_close": 131.5,
+    "entry_reference": 128.33333333333334,
+    "stop_price": 132.14761904761906,
+    "target_price": 120.70476190476191,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2330",
+    "name": "台積電",
+    "direction": "short",
+    "prev_close": 2420.0,
+    "entry_reference": 2405.0,
+    "stop_price": 2431.1428571428573,
+    "target_price": 2352.7142857142853,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4966",
+    "name": "譜瑞-KY",
+    "direction": "short",
+    "prev_close": 540.0,
+    "entry_reference": 527.6666666666666,
+    "stop_price": 535.0380952380953,
+    "target_price": 512.9238095238094,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "short",
+    "prev_close": 146.5,
+    "entry_reference": 145.66666666666666,
+    "stop_price": 155.00952380952378,
+    "target_price": 126.9809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3702",
+    "name": "大聯大",
+    "direction": "short",
+    "prev_close": 114.5,
+    "entry_reference": 113.83333333333333,
+    "stop_price": 115.5047619047619,
+    "target_price": 110.49047619047617,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6227",
+    "name": "茂綸",
+    "direction": "short",
+    "prev_close": 128.0,
+    "entry_reference": 123.33333333333333,
+    "stop_price": 126.93333333333332,
+    "target_price": 116.13333333333334,
+    "atr_multiple": 1.2
+  }
+]
