@@ -1,0 +1,62 @@
+[
+  {
+    "stock_id": "4953",
+    "name": "緯致",
+    "direction": "long",
+    "prev_close": 120.0,
+    "entry_reference": 122.16666666666667,
+    "stop_price": 120.92380952380952,
+    "target_price": 124.65238095238097,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3147",
+    "name": "大綜",
+    "direction": "long",
+    "prev_close": 295.5,
+    "entry_reference": 305.6666666666667,
+    "stop_price": 295.33809523809526,
+    "target_price": 326.32380952380953,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 181.5,
+    "entry_reference": 184.33333333333334,
+    "stop_price": 179.74761904761905,
+    "target_price": 193.50476190476192,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2412",
+    "name": "中華電",
+    "direction": "long",
+    "prev_close": 154.5,
+    "entry_reference": 153.5,
+    "stop_price": 152.6,
+    "target_price": 155.3,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4977",
+    "name": "眾達-KY",
+    "direction": "long",
+    "prev_close": 171.0,
+    "entry_reference": 179.33333333333334,
+    "stop_price": 172.56190476190477,
+    "target_price": 192.8761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4904",
+    "name": "遠傳",
+    "direction": "long",
+    "prev_close": 112.0,
+    "entry_reference": 111.5,
+    "stop_price": 110.3,
+    "target_price": 113.9,
+    "atr_multiple": 1.2
+  }
+]

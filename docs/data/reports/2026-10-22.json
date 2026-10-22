@@ -1,0 +1,77 @@
+{
+  "as_of": "2026-10-22",
+  "generated_at": "2026-10-22T04:49:57.222954+00:00",
+  "is_synthetic": false,
+  "issues": [
+    "股價資料存在缺漏值",
+    "全額交割股清單目前尚未串接資料源，本次篩選未排除全額交割股，下單前請自行核對",
+    "先賣後買(放空)資格目前用「排除處置股/全額交割股後的剩餘股票」保守近似，未串接官方當沖資格清單，下單前請自行到券商系統核對"
+  ],
+  "breadth_pct": 0.4012588512981904,
+  "breadth_risk_scale": 1.0,
+  "futures": {
+    "available": false,
+    "direction": null,
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "contracts": null
+  },
+  "long_candidates": [
+    {
+      "stock_id": "4953",
+      "name": "緯致",
+      "sector": "資訊服務業",
+      "score": 55.0,
+      "entry": 122.16666666666667,
+      "stop": 120.92380952380952,
+      "target": 124.65238095238097
+    },
+    {
+      "stock_id": "3147",
+      "name": "大綜",
+      "sector": "資訊服務業",
+      "score": 40.6,
+      "entry": 305.6666666666667,
+      "stop": 295.33809523809526,
+      "target": 326.32380952380953
+    },
+    {
+      "stock_id": "2480",
+      "name": "敦陽科",
+      "sector": "資訊服務業",
+      "score": 37.8,
+      "entry": 184.33333333333334,
+      "stop": 179.74761904761905,
+      "target": 193.50476190476192
+    },
+    {
+      "stock_id": "2412",
+      "name": "中華電",
+      "sector": "通信網路業",
+      "score": 77.8,
+      "entry": 153.5,
+      "stop": 152.6,
+      "target": 155.3
+    },
+    {
+      "stock_id": "4977",
+      "name": "眾達-KY",
+      "sector": "通信網路業",
+      "score": 66.3,
+      "entry": 179.33333333333334,
+      "stop": 172.56190476190477,
+      "target": 192.8761904761905
+    },
+    {
+      "stock_id": "4904",
+      "name": "遠傳",
+      "sector": "通信網路業",
+      "score": 61.8,
+      "entry": 111.5,
+      "stop": 110.3,
+      "target": 113.9
+    }
+  ],
+  "short_candidates": []
+}
