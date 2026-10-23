@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "4953",
+    "name": "緯致",
+    "direction": "long",
+    "prev_close": 123.0,
+    "entry_reference": 125.16666666666667,
+    "stop_price": 123.70952380952382,
+    "target_price": 128.0809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 183.5,
+    "entry_reference": 186.16666666666666,
+    "stop_price": 181.45238095238093,
+    "target_price": 195.5952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 199.0,
+    "entry_reference": 200.0,
+    "stop_price": 198.75714285714287,
+    "target_price": 202.48571428571427,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "short",
+    "prev_close": 153.0,
+    "entry_reference": 146.0,
+    "stop_price": 156.37142857142857,
+    "target_price": 125.25714285714287,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5434",
+    "name": "崇越",
+    "direction": "short",
+    "prev_close": 573.0,
+    "entry_reference": 559.0,
+    "stop_price": 570.7428571428571,
+    "target_price": 535.5142857142857,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3702",
+    "name": "大聯大",
+    "direction": "short",
+    "prev_close": 115.0,
+    "entry_reference": 115.0,
+    "stop_price": 116.41428571428571,
+    "target_price": 112.17142857142858,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8227",
+    "name": "巨有科技",
+    "direction": "short",
+    "prev_close": 286.0,
+    "entry_reference": 278.6666666666667,
+    "stop_price": 299.3666666666667,
+    "target_price": 237.2666666666667,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3443",
+    "name": "創意",
+    "direction": "short",
+    "prev_close": 8000.0,
+    "entry_reference": 7796.666666666667,
+    "stop_price": 8087.666666666667,
+    "target_price": 7214.666666666667,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4966",
+    "name": "譜瑞-KY",
+    "direction": "short",
+    "prev_close": 527.0,
+    "entry_reference": 519.3333333333334,
+    "stop_price": 528.2476190476191,
+    "target_price": 501.50476190476195,
+    "atr_multiple": 1.2
+  }
+]
