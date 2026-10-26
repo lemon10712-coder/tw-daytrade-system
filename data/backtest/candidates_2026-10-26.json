@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "4953",
+    "name": "緯致",
+    "direction": "long",
+    "prev_close": 125.5,
+    "entry_reference": 125.16666666666667,
+    "stop_price": 123.7952380952381,
+    "target_price": 127.9095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 201.0,
+    "entry_reference": 200.0,
+    "stop_price": 198.75714285714287,
+    "target_price": 202.48571428571427,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 186.5,
+    "entry_reference": 186.16666666666666,
+    "stop_price": 181.88095238095238,
+    "target_price": 194.7380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 113.5,
+    "entry_reference": 113.83333333333333,
+    "stop_price": 111.86190476190475,
+    "target_price": 117.77619047619048,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 158.5,
+    "entry_reference": 158.66666666666666,
+    "stop_price": 156.13809523809522,
+    "target_price": 163.72380952380954,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 165.0,
+    "entry_reference": 165.66666666666666,
+    "stop_price": 163.2238095238095,
+    "target_price": 170.55238095238096,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5434",
+    "name": "崇越",
+    "direction": "short",
+    "prev_close": 550.0,
+    "entry_reference": 559.0,
+    "stop_price": 567.5714285714286,
+    "target_price": 541.8571428571429,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3010",
+    "name": "華立",
+    "direction": "short",
+    "prev_close": 135.5,
+    "entry_reference": 137.0,
+    "stop_price": 139.0142857142857,
+    "target_price": 132.9714285714286,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "short",
+    "prev_close": 143.0,
+    "entry_reference": 146.0,
+    "stop_price": 156.32857142857142,
+    "target_price": 125.34285714285716,
+    "atr_multiple": 1.2
+  }
+]
