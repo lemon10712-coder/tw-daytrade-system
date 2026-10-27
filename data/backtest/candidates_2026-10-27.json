@@ -1,0 +1,62 @@
+[
+  {
+    "stock_id": "4953",
+    "name": "緯致",
+    "direction": "long",
+    "prev_close": 125.5,
+    "entry_reference": 125.16666666666667,
+    "stop_price": 123.83809523809525,
+    "target_price": 127.82380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 201.0,
+    "entry_reference": 200.0,
+    "stop_price": 198.75714285714287,
+    "target_price": 202.48571428571427,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 122.5,
+    "entry_reference": 122.0,
+    "stop_price": 120.2,
+    "target_price": 125.6,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5434",
+    "name": "崇越",
+    "direction": "short",
+    "prev_close": 550.0,
+    "entry_reference": 559.0,
+    "stop_price": 567.4857142857143,
+    "target_price": 542.0285714285715,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6227",
+    "name": "茂綸",
+    "direction": "short",
+    "prev_close": 120.5,
+    "entry_reference": 122.16666666666667,
+    "stop_price": 125.80952380952381,
+    "target_price": 114.8809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "short",
+    "prev_close": 143.0,
+    "entry_reference": 146.0,
+    "stop_price": 156.07142857142858,
+    "target_price": 125.85714285714283,
+    "atr_multiple": 1.2
+  }
+]

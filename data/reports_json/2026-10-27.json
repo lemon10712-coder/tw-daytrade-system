@@ -1,0 +1,78 @@
+{
+  "as_of": "2026-10-27",
+  "generated_at": "2026-10-27T05:08:00.789681+00:00",
+  "is_synthetic": false,
+  "issues": [
+    "股價資料存在缺漏值",
+    "全額交割股清單目前尚未串接資料源，本次篩選未排除全額交割股，下單前請自行核對",
+    "先賣後買(放空)資格目前用「排除處置股/全額交割股後的剩餘股票」保守近似，未串接官方當沖資格清單，下單前請自行到券商系統核對"
+  ],
+  "breadth_pct": 0.34352941176470586,
+  "breadth_risk_scale": 0.5,
+  "futures": {
+    "available": false,
+    "direction": null,
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "contracts": null
+  },
+  "long_candidates": [
+    {
+      "stock_id": "4953",
+      "name": "緯致",
+      "sector": "資訊服務業",
+      "score": 90.0,
+      "entry": 125.16666666666667,
+      "stop": 123.83809523809525,
+      "target": 127.82380952380952
+    },
+    {
+      "stock_id": "6214",
+      "name": "精誠",
+      "sector": "資訊服務業",
+      "score": 76.2,
+      "entry": 200.0,
+      "stop": 198.75714285714287,
+      "target": 202.48571428571427
+    },
+    {
+      "stock_id": "3029",
+      "name": "零壹",
+      "sector": "資訊服務業",
+      "score": 72.0,
+      "entry": 122.0,
+      "stop": 120.2,
+      "target": 125.6
+    }
+  ],
+  "short_candidates": [
+    {
+      "stock_id": "5434",
+      "name": "崇越",
+      "sector": "電子通路業",
+      "score": 71.6,
+      "entry": 559.0,
+      "stop": 567.4857142857143,
+      "target": 542.0285714285715
+    },
+    {
+      "stock_id": "6227",
+      "name": "茂綸",
+      "sector": "電子通路業",
+      "score": 33.1,
+      "entry": 122.16666666666667,
+      "stop": 125.80952380952381,
+      "target": 114.8809523809524
+    },
+    {
+      "stock_id": "3055",
+      "name": "蔚華科",
+      "sector": "電子通路業",
+      "score": 32.4,
+      "entry": 146.0,
+      "stop": 156.07142857142858,
+      "target": 125.85714285714283
+    }
+  ]
+}
