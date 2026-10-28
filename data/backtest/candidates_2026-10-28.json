@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "4953",
+    "name": "緯致",
+    "direction": "long",
+    "prev_close": 125.5,
+    "entry_reference": 127.33333333333333,
+    "stop_price": 125.91904761904762,
+    "target_price": 130.16190476190474,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 122.5,
+    "entry_reference": 126.66666666666667,
+    "stop_price": 124.48095238095239,
+    "target_price": 131.03809523809525,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 201.0,
+    "entry_reference": 202.5,
+    "stop_price": 201.17142857142858,
+    "target_price": 205.15714285714284,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 113.5,
+    "entry_reference": 113.83333333333333,
+    "stop_price": 111.94761904761904,
+    "target_price": 117.6047619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 158.5,
+    "entry_reference": 161.5,
+    "stop_price": 158.97142857142856,
+    "target_price": 166.55714285714288,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 165.0,
+    "entry_reference": 167.33333333333334,
+    "stop_price": 165.06190476190477,
+    "target_price": 171.8761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "short",
+    "prev_close": 165.0,
+    "entry_reference": 163.83333333333334,
+    "stop_price": 166.2761904761905,
+    "target_price": 158.94761904761904,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "short",
+    "prev_close": 255.0,
+    "entry_reference": 251.0,
+    "stop_price": 258.07142857142856,
+    "target_price": 236.8571428571429,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "short",
+    "prev_close": 120.0,
+    "entry_reference": 120.33333333333333,
+    "stop_price": 122.81904761904761,
+    "target_price": 115.36190476190477,
+    "atr_multiple": 1.2
+  }
+]
