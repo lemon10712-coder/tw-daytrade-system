@@ -1,0 +1,62 @@
+[
+  {
+    "stock_id": "4953",
+    "name": "緯致",
+    "direction": "long",
+    "prev_close": 127.0,
+    "entry_reference": 127.0,
+    "stop_price": 125.54285714285714,
+    "target_price": 129.9142857142857,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 129.0,
+    "entry_reference": 126.66666666666667,
+    "stop_price": 124.48095238095239,
+    "target_price": 131.03809523809525,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 203.0,
+    "entry_reference": 200.83333333333334,
+    "stop_price": 199.50476190476192,
+    "target_price": 203.4904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2465",
+    "name": "麗臺",
+    "direction": "long",
+    "prev_close": 93.9,
+    "entry_reference": 100.2,
+    "stop_price": 96.47142857142858,
+    "target_price": 107.65714285714286,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2357",
+    "name": "華碩",
+    "direction": "long",
+    "prev_close": 967.0,
+    "entry_reference": 984.0,
+    "stop_price": 966.6857142857143,
+    "target_price": 1018.6285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2377",
+    "name": "微星",
+    "direction": "long",
+    "prev_close": 166.0,
+    "entry_reference": 168.0,
+    "stop_price": 165.94285714285715,
+    "target_price": 172.1142857142857,
+    "atr_multiple": 1.2
+  }
+]
