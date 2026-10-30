@@ -324,28 +324,39 @@
       "atr_multiples_used": [
         1.2
       ]
+    },
+    "2026-10-29": {
+      "total_candidates": 1,
+      "entry_touched": 1,
+      "hit_stop_only": 0,
+      "hit_target_only": 0,
+      "both_same_day": 0,
+      "neither": 1,
+      "atr_multiples_used": [
+        1.2
+      ]
     }
   },
   "cumulative": {
-    "total_candidates": 246,
-    "entry_touched": 169,
+    "total_candidates": 247,
+    "entry_touched": 170,
     "hit_stop_only": 65,
     "hit_target_only": 22,
     "both_same_day": 8,
-    "neither": 74,
-    "entry_touch_rate": 0.687,
-    "sample_trading_days": 33
+    "neither": 75,
+    "entry_touch_rate": 0.6883,
+    "sample_trading_days": 34
   },
   "by_atr_multiple": {
     "1.2": {
-      "total_candidates": 156,
-      "entry_touched": 103,
+      "total_candidates": 157,
+      "entry_touched": 104,
       "hit_stop_only": 42,
       "hit_target_only": 12,
       "both_same_day": 4,
-      "neither": 45,
-      "trading_days": 20,
-      "entry_touch_rate": 0.6603
+      "neither": 46,
+      "trading_days": 21,
+      "entry_touch_rate": 0.6624
     }
   }
 }
