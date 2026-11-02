@@ -1,0 +1,102 @@
+[
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "long",
+    "prev_close": 162.0,
+    "entry_reference": 160.33333333333334,
+    "stop_price": 158.2761904761905,
+    "target_price": 164.44761904761904,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "long",
+    "prev_close": 116.5,
+    "entry_reference": 115.16666666666667,
+    "stop_price": 113.53809523809524,
+    "target_price": 118.42380952380954,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 168.5,
+    "entry_reference": 167.5,
+    "stop_price": 165.22857142857143,
+    "target_price": 172.04285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3023",
+    "name": "信邦",
+    "direction": "short",
+    "prev_close": 259.5,
+    "entry_reference": 251.16666666666666,
+    "stop_price": 258.53809523809525,
+    "target_price": 236.42380952380947,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2308",
+    "name": "台達電",
+    "direction": "short",
+    "prev_close": 1480.0,
+    "entry_reference": 1355.0,
+    "stop_price": 1417.142857142857,
+    "target_price": 1230.7142857142858,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6213",
+    "name": "聯茂",
+    "direction": "short",
+    "prev_close": 745.0,
+    "entry_reference": 691.3333333333334,
+    "stop_price": 730.6761904761905,
+    "target_price": 612.6476190476191,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1303",
+    "name": "南亞",
+    "direction": "short",
+    "prev_close": 312.0,
+    "entry_reference": 293.8333333333333,
+    "stop_price": 310.2047619047619,
+    "target_price": 261.0904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4766",
+    "name": "南寶",
+    "direction": "short",
+    "prev_close": 361.5,
+    "entry_reference": 354.8333333333333,
+    "stop_price": 358.4761904761905,
+    "target_price": 347.547619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "short",
+    "prev_close": 161.5,
+    "entry_reference": 158.33333333333334,
+    "stop_price": 161.2047619047619,
+    "target_price": 152.5904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4764",
+    "name": "雙鍵",
+    "direction": "short",
+    "prev_close": 155.5,
+    "entry_reference": 145.66666666666666,
+    "stop_price": 152.35238095238094,
+    "target_price": 132.2952380952381,
+    "atr_multiple": 1.2
+  }
+]
