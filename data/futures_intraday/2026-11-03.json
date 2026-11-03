@@ -1,11 +1,11 @@
 {
   "date": "2026-11-03",
-  "updated_at": "2026-11-03T13:54:33+08:00",
+  "updated_at": "2026-11-03T21:45:03+08:00",
   "tx_snapshot": {
     "contract": "TX116",
     "price": 43376.0,
     "change": -1851.0,
-    "total_volume": 77309
+    "total_volume": 115669
   },
   "minute_series": [
     {
