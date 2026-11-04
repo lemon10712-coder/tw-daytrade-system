@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "2303",
+    "name": "聯電",
+    "direction": "short",
+    "prev_close": 110.0,
+    "entry_reference": 104.83333333333333,
+    "stop_price": 109.29047619047618,
+    "target_price": 95.91904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6533",
+    "name": "晶心科",
+    "direction": "short",
+    "prev_close": 270.0,
+    "entry_reference": 262.3333333333333,
+    "stop_price": 279.4761904761905,
+    "target_price": 228.04761904761898,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2330",
+    "name": "台積電",
+    "direction": "short",
+    "prev_close": 2330.0,
+    "entry_reference": 2303.3333333333335,
+    "stop_price": 2329.476190476191,
+    "target_price": 2251.047619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2486",
+    "name": "一詮",
+    "direction": "short",
+    "prev_close": 193.5,
+    "entry_reference": 179.83333333333334,
+    "stop_price": 186.60476190476192,
+    "target_price": 166.2904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3008",
+    "name": "大立光",
+    "direction": "short",
+    "prev_close": 5490.0,
+    "entry_reference": 5080.0,
+    "stop_price": 5347.857142857143,
+    "target_price": 4544.285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5234",
+    "name": "達興材料",
+    "direction": "short",
+    "prev_close": 271.0,
+    "entry_reference": 261.6666666666667,
+    "stop_price": 269.0809523809524,
+    "target_price": 246.83809523809526,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4766",
+    "name": "南寶",
+    "direction": "short",
+    "prev_close": 355.0,
+    "entry_reference": 348.8333333333333,
+    "stop_price": 352.69047619047615,
+    "target_price": 341.11904761904765,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1773",
+    "name": "勝一",
+    "direction": "short",
+    "prev_close": 158.5,
+    "entry_reference": 153.83333333333334,
+    "stop_price": 156.91904761904763,
+    "target_price": 147.66190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "short",
+    "prev_close": 169.5,
+    "entry_reference": 158.0,
+    "stop_price": 164.72857142857143,
+    "target_price": 144.54285714285714,
+    "atr_multiple": 1.2
+  }
+]
