@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "2303",
+    "name": "聯電",
+    "direction": "short",
+    "prev_close": 103.0,
+    "entry_reference": 104.33333333333333,
+    "stop_price": 108.27619047619046,
+    "target_price": 96.44761904761906,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2344",
+    "name": "華邦電",
+    "direction": "short",
+    "prev_close": 146.0,
+    "entry_reference": 140.66666666666666,
+    "stop_price": 147.13809523809522,
+    "target_price": 127.72380952380954,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2330",
+    "name": "台積電",
+    "direction": "short",
+    "prev_close": 2295.0,
+    "entry_reference": 2271.6666666666665,
+    "stop_price": 2296.523809523809,
+    "target_price": 2221.952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2308",
+    "name": "台達電",
+    "direction": "short",
+    "prev_close": 1270.0,
+    "entry_reference": 1228.3333333333333,
+    "stop_price": 1278.904761904762,
+    "target_price": 1127.190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3023",
+    "name": "信邦",
+    "direction": "short",
+    "prev_close": 237.5,
+    "entry_reference": 244.33333333333334,
+    "stop_price": 252.81904761904764,
+    "target_price": 227.36190476190475,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3376",
+    "name": "新日興",
+    "direction": "short",
+    "prev_close": 127.0,
+    "entry_reference": 124.16666666666667,
+    "stop_price": 130.5952380952381,
+    "target_price": 111.30952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2455",
+    "name": "全新",
+    "direction": "short",
+    "prev_close": 405.0,
+    "entry_reference": 383.6666666666667,
+    "stop_price": 402.9952380952381,
+    "target_price": 345.00952380952384,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6442",
+    "name": "光聖",
+    "direction": "short",
+    "prev_close": 1140.0,
+    "entry_reference": 1111.6666666666667,
+    "stop_price": 1164.8095238095239,
+    "target_price": 1005.3809523809525,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3596",
+    "name": "智易",
+    "direction": "short",
+    "prev_close": 145.0,
+    "entry_reference": 143.5,
+    "stop_price": 145.72857142857143,
+    "target_price": 139.04285714285714,
+    "atr_multiple": 1.2
+  }
+]
