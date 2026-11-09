@@ -1,0 +1,122 @@
+[
+  {
+    "stock_id": "8099",
+    "name": "大世科",
+    "direction": "long",
+    "prev_close": 152.0,
+    "entry_reference": 146.33333333333334,
+    "stop_price": 137.57333333333335,
+    "target_price": 163.85333333333332,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1476",
+    "name": "儒鴻",
+    "direction": "long",
+    "prev_close": 339.5,
+    "entry_reference": 341.0,
+    "stop_price": 335.8142857142857,
+    "target_price": 351.3714285714286,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1477",
+    "name": "聚陽",
+    "direction": "long",
+    "prev_close": 214.5,
+    "entry_reference": 210.33333333333334,
+    "stop_price": 208.4904761904762,
+    "target_price": 214.01904761904765,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2330",
+    "name": "台積電",
+    "direction": "short",
+    "prev_close": 2240.0,
+    "entry_reference": 2116.6666666666665,
+    "stop_price": 2150.523809523809,
+    "target_price": 2048.952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3711",
+    "name": "日月光投控",
+    "direction": "short",
+    "prev_close": 572.0,
+    "entry_reference": 531.0,
+    "stop_price": 557.8285714285714,
+    "target_price": 477.34285714285716,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2454",
+    "name": "聯發科",
+    "direction": "short",
+    "prev_close": 3460.0,
+    "entry_reference": 3328.3333333333335,
+    "stop_price": 3461.6190476190477,
+    "target_price": 3061.761904761905,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4977",
+    "name": "眾達-KY",
+    "direction": "short",
+    "prev_close": 175.5,
+    "entry_reference": 164.5,
+    "stop_price": 175.3,
+    "target_price": 142.89999999999998,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4979",
+    "name": "華星光",
+    "direction": "short",
+    "prev_close": 346.5,
+    "entry_reference": 318.0,
+    "stop_price": 360.9428571428571,
+    "target_price": 232.11428571428576,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6442",
+    "name": "光聖",
+    "direction": "short",
+    "prev_close": 1070.0,
+    "entry_reference": 997.6666666666666,
+    "stop_price": 1057.6666666666665,
+    "target_price": 877.6666666666669,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3213",
+    "name": "茂訊",
+    "direction": "short",
+    "prev_close": 121.0,
+    "entry_reference": 117.66666666666667,
+    "stop_price": 119.33809523809525,
+    "target_price": 114.32380952380952,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3515",
+    "name": "華擎",
+    "direction": "short",
+    "prev_close": 215.5,
+    "entry_reference": 199.33333333333334,
+    "stop_price": 205.84761904761905,
+    "target_price": 186.30476190476193,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2301",
+    "name": "光寶科",
+    "direction": "short",
+    "prev_close": 211.5,
+    "entry_reference": 197.33333333333334,
+    "stop_price": 205.3047619047619,
+    "target_price": 181.39047619047622,
+    "atr_multiple": 1.2
+  }
+]
