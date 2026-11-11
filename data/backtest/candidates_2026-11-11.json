@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "8099",
+    "name": "大世科",
+    "direction": "long",
+    "prev_close": 140.5,
+    "entry_reference": 139.33333333333334,
+    "stop_price": 129.90476190476193,
+    "target_price": 158.19047619047618,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3147",
+    "name": "大綜",
+    "direction": "long",
+    "prev_close": 319.5,
+    "entry_reference": 344.8333333333333,
+    "stop_price": 331.2047619047619,
+    "target_price": 372.0904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 114.0,
+    "entry_reference": 123.33333333333333,
+    "stop_price": 119.99047619047619,
+    "target_price": 130.01904761904763,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "short",
+    "prev_close": 158.0,
+    "entry_reference": 156.0,
+    "stop_price": 158.05714285714285,
+    "target_price": 151.8857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2882",
+    "name": "國泰金",
+    "direction": "short",
+    "prev_close": 111.0,
+    "entry_reference": 110.66666666666667,
+    "stop_price": 112.55238095238096,
+    "target_price": 106.8952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2881",
+    "name": "富邦金",
+    "direction": "short",
+    "prev_close": 153.5,
+    "entry_reference": 153.83333333333334,
+    "stop_price": 156.2761904761905,
+    "target_price": 148.94761904761904,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1736",
+    "name": "喬山",
+    "direction": "short",
+    "prev_close": 110.5,
+    "entry_reference": 112.5,
+    "stop_price": 114.98571428571428,
+    "target_price": 107.52857142857144,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8462",
+    "name": "柏文",
+    "direction": "short",
+    "prev_close": 150.0,
+    "entry_reference": 150.66666666666666,
+    "stop_price": 152.1238095238095,
+    "target_price": 147.75238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6890",
+    "name": "來億-KY",
+    "direction": "short",
+    "prev_close": 142.0,
+    "entry_reference": 141.33333333333334,
+    "stop_price": 143.9904761904762,
+    "target_price": 136.01904761904765,
+    "atr_multiple": 1.2
+  }
+]
