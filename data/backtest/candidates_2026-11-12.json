@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "3147",
+    "name": "大綜",
+    "direction": "long",
+    "prev_close": 351.0,
+    "entry_reference": 353.6666666666667,
+    "stop_price": 340.252380952381,
+    "target_price": 380.4952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 125.0,
+    "entry_reference": 132.0,
+    "stop_price": 128.1,
+    "target_price": 139.8,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 170.0,
+    "entry_reference": 177.33333333333334,
+    "stop_price": 173.60476190476192,
+    "target_price": 184.7904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3715",
+    "name": "定穎投控",
+    "direction": "long",
+    "prev_close": 119.0,
+    "entry_reference": 127.0,
+    "stop_price": 118.89142857142858,
+    "target_price": 143.21714285714285,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6538",
+    "name": "倉和",
+    "direction": "long",
+    "prev_close": 309.5,
+    "entry_reference": 301.6666666666667,
+    "stop_price": 283.7952380952381,
+    "target_price": 337.4095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6715",
+    "name": "嘉基",
+    "direction": "long",
+    "prev_close": 412.5,
+    "entry_reference": 441.6666666666667,
+    "stop_price": 410.89523809523814,
+    "target_price": 503.2095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6890",
+    "name": "來億-KY",
+    "direction": "short",
+    "prev_close": 140.0,
+    "entry_reference": 138.16666666666666,
+    "stop_price": 140.86666666666665,
+    "target_price": 132.76666666666668,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8462",
+    "name": "柏文",
+    "direction": "short",
+    "prev_close": 150.5,
+    "entry_reference": 146.83333333333334,
+    "stop_price": 148.54761904761907,
+    "target_price": 143.4047619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "1736",
+    "name": "喬山",
+    "direction": "short",
+    "prev_close": 112.5,
+    "entry_reference": 108.5,
+    "stop_price": 111.07142857142857,
+    "target_price": 103.35714285714286,
+    "atr_multiple": 1.2
+  }
+]
