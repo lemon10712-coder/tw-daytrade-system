@@ -1,0 +1,142 @@
+[
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "long",
+    "prev_close": 138.0,
+    "entry_reference": 133.16666666666666,
+    "stop_price": 128.1952380952381,
+    "target_price": 143.10952380952378,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 193.5,
+    "entry_reference": 190.83333333333334,
+    "stop_price": 185.7761904761905,
+    "target_price": 200.94761904761904,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6214",
+    "name": "精誠",
+    "direction": "long",
+    "prev_close": 179.0,
+    "entry_reference": 187.0,
+    "stop_price": 178.64285714285714,
+    "target_price": 203.71428571428572,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7765",
+    "name": "中華資安",
+    "direction": "long",
+    "prev_close": 269.5,
+    "entry_reference": 295.8333333333333,
+    "stop_price": 289.147619047619,
+    "target_price": 309.20476190476194,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8464",
+    "name": "億豐",
+    "direction": "long",
+    "prev_close": 358.5,
+    "entry_reference": 364.5,
+    "stop_price": 358.15714285714284,
+    "target_price": 377.1857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2449",
+    "name": "京元電子",
+    "direction": "short",
+    "prev_close": 213.5,
+    "entry_reference": 196.66666666666666,
+    "stop_price": 210.59523809523807,
+    "target_price": 168.80952380952382,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2351",
+    "name": "順德",
+    "direction": "short",
+    "prev_close": 149.0,
+    "entry_reference": 140.0,
+    "stop_price": 151.0142857142857,
+    "target_price": 117.97142857142859,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3135",
+    "name": "凌航",
+    "direction": "short",
+    "prev_close": 124.0,
+    "entry_reference": 116.66666666666667,
+    "stop_price": 122.32380952380953,
+    "target_price": 105.35238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6442",
+    "name": "光聖",
+    "direction": "short",
+    "prev_close": 1160.0,
+    "entry_reference": 1076.6666666666667,
+    "stop_price": 1154.2380952380954,
+    "target_price": 921.5238095238094,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6285",
+    "name": "啟碁",
+    "direction": "short",
+    "prev_close": 193.5,
+    "entry_reference": 184.83333333333334,
+    "stop_price": 197.7761904761905,
+    "target_price": 158.94761904761904,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2345",
+    "name": "智邦",
+    "direction": "short",
+    "prev_close": 1520.0,
+    "entry_reference": 1418.3333333333333,
+    "stop_price": 1510.904761904762,
+    "target_price": 1233.190476190476,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2233",
+    "name": "宇隆",
+    "direction": "short",
+    "prev_close": 113.0,
+    "entry_reference": 106.5,
+    "stop_price": 112.45714285714286,
+    "target_price": 94.58571428571429,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4551",
+    "name": "智伸科",
+    "direction": "short",
+    "prev_close": 141.0,
+    "entry_reference": 133.0,
+    "stop_price": 141.74285714285713,
+    "target_price": 115.51428571428573,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2207",
+    "name": "和泰車",
+    "direction": "short",
+    "prev_close": 527.0,
+    "entry_reference": 530.3333333333334,
+    "stop_price": 539.1619047619048,
+    "target_price": 512.6761904761905,
+    "atr_multiple": 1.2
+  }
+]
