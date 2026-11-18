@@ -1,0 +1,152 @@
+[
+  {
+    "stock_id": "8272",
+    "name": "全景軟體",
+    "direction": "long",
+    "prev_close": 109.0,
+    "entry_reference": 107.5,
+    "stop_price": 101.92,
+    "target_price": 118.66,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6751",
+    "name": "智聯服務",
+    "direction": "long",
+    "prev_close": 103.0,
+    "entry_reference": 104.0,
+    "stop_price": 97.76,
+    "target_price": 116.47999999999999,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "long",
+    "prev_close": 188.0,
+    "entry_reference": 183.16666666666666,
+    "stop_price": 177.8095238095238,
+    "target_price": 193.88095238095238,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7765",
+    "name": "中華資安",
+    "direction": "long",
+    "prev_close": 296.0,
+    "entry_reference": 281.8333333333333,
+    "stop_price": 274.8047619047619,
+    "target_price": 295.89047619047614,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6690",
+    "name": "安碁資訊",
+    "direction": "long",
+    "prev_close": 212.0,
+    "entry_reference": 216.33333333333334,
+    "stop_price": 211.1904761904762,
+    "target_price": 226.61904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6870",
+    "name": "騰雲",
+    "direction": "long",
+    "prev_close": 498.0,
+    "entry_reference": 430.6666666666667,
+    "stop_price": 404.00952380952384,
+    "target_price": 483.9809523809524,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6121",
+    "name": "新普",
+    "direction": "short",
+    "prev_close": 312.0,
+    "entry_reference": 285.5,
+    "stop_price": 298.48571428571427,
+    "target_price": 259.52857142857147,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2376",
+    "name": "技嘉",
+    "direction": "short",
+    "prev_close": 277.5,
+    "entry_reference": 274.8333333333333,
+    "stop_price": 285.0333333333333,
+    "target_price": 254.43333333333334,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5289",
+    "name": "宜鼎",
+    "direction": "short",
+    "prev_close": 960.0,
+    "entry_reference": 827.3333333333334,
+    "stop_price": 881.9333333333334,
+    "target_price": 718.1333333333333,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "short",
+    "prev_close": 124.0,
+    "entry_reference": 116.33333333333333,
+    "stop_price": 125.84761904761905,
+    "target_price": 97.30476190476189,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4772",
+    "name": "台特化",
+    "direction": "short",
+    "prev_close": 215.0,
+    "entry_reference": 192.5,
+    "stop_price": 204.5,
+    "target_price": 168.5,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4766",
+    "name": "南寶",
+    "direction": "short",
+    "prev_close": 313.5,
+    "entry_reference": 314.3333333333333,
+    "stop_price": 321.7047619047619,
+    "target_price": 299.5904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3036",
+    "name": "文曄",
+    "direction": "short",
+    "prev_close": 178.5,
+    "entry_reference": 177.0,
+    "stop_price": 183.6,
+    "target_price": 163.8,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3010",
+    "name": "華立",
+    "direction": "short",
+    "prev_close": 113.0,
+    "entry_reference": 112.0,
+    "stop_price": 115.38571428571429,
+    "target_price": 105.22857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3055",
+    "name": "蔚華科",
+    "direction": "short",
+    "prev_close": 123.5,
+    "entry_reference": 117.0,
+    "stop_price": 124.75714285714285,
+    "target_price": 101.4857142857143,
+    "atr_multiple": 1.2
+  }
+]
