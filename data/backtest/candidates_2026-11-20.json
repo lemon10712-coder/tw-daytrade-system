@@ -1,0 +1,92 @@
+[
+  {
+    "stock_id": "7788",
+    "name": "松川精密",
+    "direction": "short",
+    "prev_close": 184.5,
+    "entry_reference": 178.33333333333334,
+    "stop_price": 191.4904761904762,
+    "target_price": 152.01904761904765,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3044",
+    "name": "健鼎",
+    "direction": "short",
+    "prev_close": 481.5,
+    "entry_reference": 448.3333333333333,
+    "stop_price": 485.747619047619,
+    "target_price": 373.5047619047619,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7795",
+    "name": "長廣",
+    "direction": "short",
+    "prev_close": 301.0,
+    "entry_reference": 281.5,
+    "stop_price": 301.4714285714286,
+    "target_price": 241.55714285714282,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8016",
+    "name": "矽創",
+    "direction": "short",
+    "prev_close": 249.0,
+    "entry_reference": 244.33333333333334,
+    "stop_price": 253.63333333333335,
+    "target_price": 225.73333333333332,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8028",
+    "name": "昇陽半導體",
+    "direction": "short",
+    "prev_close": 169.0,
+    "entry_reference": 158.83333333333334,
+    "stop_price": 172.24761904761905,
+    "target_price": 132.00476190476192,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2449",
+    "name": "京元電子",
+    "direction": "short",
+    "prev_close": 194.0,
+    "entry_reference": 180.0,
+    "stop_price": 195.64285714285714,
+    "target_price": 148.71428571428572,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4722",
+    "name": "國精化",
+    "direction": "short",
+    "prev_close": 118.5,
+    "entry_reference": 110.83333333333333,
+    "stop_price": 120.00476190476189,
+    "target_price": 92.4904761904762,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4766",
+    "name": "南寶",
+    "direction": "short",
+    "prev_close": 320.5,
+    "entry_reference": 314.1666666666667,
+    "stop_price": 321.83809523809526,
+    "target_price": 298.82380952380953,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "4755",
+    "name": "三福化",
+    "direction": "short",
+    "prev_close": 124.0,
+    "entry_reference": 116.33333333333333,
+    "stop_price": 122.46190476190476,
+    "target_price": 104.07619047619046,
+    "atr_multiple": 1.2
+  }
+]
