@@ -1,0 +1,122 @@
+[
+  {
+    "stock_id": "2850",
+    "name": "新產",
+    "direction": "long",
+    "prev_close": 151.0,
+    "entry_reference": 162.0,
+    "stop_price": 157.15714285714284,
+    "target_price": 171.6857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2603",
+    "name": "長榮",
+    "direction": "long",
+    "prev_close": 234.5,
+    "entry_reference": 251.33333333333334,
+    "stop_price": 243.01904761904763,
+    "target_price": 267.96190476190475,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2645",
+    "name": "長榮航太",
+    "direction": "long",
+    "prev_close": 151.5,
+    "entry_reference": 160.33333333333334,
+    "stop_price": 153.73333333333335,
+    "target_price": 173.53333333333333,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3006",
+    "name": "晶豪科",
+    "direction": "short",
+    "prev_close": 191.5,
+    "entry_reference": 192.0,
+    "stop_price": 205.45714285714286,
+    "target_price": 165.0857142857143,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3529",
+    "name": "力旺",
+    "direction": "short",
+    "prev_close": 2025.0,
+    "entry_reference": 1898.3333333333333,
+    "stop_price": 2113.047619047619,
+    "target_price": 1468.9047619047622,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8299",
+    "name": "群聯",
+    "direction": "short",
+    "prev_close": 1595.0,
+    "entry_reference": 1510.0,
+    "stop_price": 1657.857142857143,
+    "target_price": 1214.2857142857142,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8069",
+    "name": "元太",
+    "direction": "short",
+    "prev_close": 129.0,
+    "entry_reference": 121.5,
+    "stop_price": 127.71428571428571,
+    "target_price": 109.07142857142858,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6419",
+    "name": "京晨科",
+    "direction": "short",
+    "prev_close": 119.5,
+    "entry_reference": 113.0,
+    "stop_price": 124.1,
+    "target_price": 90.80000000000001,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "5234",
+    "name": "達興材料",
+    "direction": "short",
+    "prev_close": 214.5,
+    "entry_reference": 235.5,
+    "stop_price": 246.94285714285715,
+    "target_price": 212.6142857142857,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "8155",
+    "name": "博智",
+    "direction": "short",
+    "prev_close": 217.5,
+    "entry_reference": 204.33333333333334,
+    "stop_price": 232.23333333333335,
+    "target_price": 148.53333333333333,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3526",
+    "name": "凡甲",
+    "direction": "short",
+    "prev_close": 205.5,
+    "entry_reference": 197.0,
+    "stop_price": 208.22857142857143,
+    "target_price": 174.54285714285714,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3357",
+    "name": "臺慶科",
+    "direction": "short",
+    "prev_close": 157.5,
+    "entry_reference": 148.83333333333334,
+    "stop_price": 164.60476190476192,
+    "target_price": 117.2904761904762,
+    "atr_multiple": 1.2
+  }
+]
