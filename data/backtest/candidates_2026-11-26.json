@@ -1,0 +1,32 @@
+[
+  {
+    "stock_id": "3551",
+    "name": "世禾",
+    "direction": "short",
+    "prev_close": 161.0,
+    "entry_reference": 161.66666666666666,
+    "stop_price": 173.15238095238095,
+    "target_price": 138.69523809523807,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "7786",
+    "name": "東方風能",
+    "direction": "short",
+    "prev_close": 107.5,
+    "entry_reference": 101.56666666666666,
+    "stop_price": 104.73809523809524,
+    "target_price": 95.2238095238095,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6944",
+    "name": "兆聯實業",
+    "direction": "short",
+    "prev_close": 496.5,
+    "entry_reference": 471.6666666666667,
+    "stop_price": 504.5809523809524,
+    "target_price": 405.83809523809526,
+    "atr_multiple": 1.2
+  }
+]
