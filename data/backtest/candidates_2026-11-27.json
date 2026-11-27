@@ -1,0 +1,42 @@
+[
+  {
+    "stock_id": "2645",
+    "name": "長榮航太",
+    "direction": "long",
+    "prev_close": 148.5,
+    "entry_reference": 156.66666666666666,
+    "stop_price": 148.95238095238093,
+    "target_price": 172.0952380952381,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "6231",
+    "name": "系微",
+    "direction": "short",
+    "prev_close": 160.0,
+    "entry_reference": 156.5,
+    "stop_price": 172.4857142857143,
+    "target_price": 124.52857142857141,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "2480",
+    "name": "敦陽科",
+    "direction": "short",
+    "prev_close": 176.5,
+    "entry_reference": 176.16666666666666,
+    "stop_price": 182.46666666666667,
+    "target_price": 163.56666666666663,
+    "atr_multiple": 1.2
+  },
+  {
+    "stock_id": "3029",
+    "name": "零壹",
+    "direction": "short",
+    "prev_close": 110.0,
+    "entry_reference": 110.83333333333333,
+    "stop_price": 117.3047619047619,
+    "target_price": 97.89047619047618,
+    "atr_multiple": 1.2
+  }
+]
